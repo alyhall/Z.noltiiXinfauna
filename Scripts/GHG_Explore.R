@@ -16,7 +16,7 @@
 ## Notes:
 ##
 ## Licore time was behind real time by 50 s
-##
+## Chamber Low 4, 100 shadig didn't get 4 mins
 ##
 
 ## Packages Needed
@@ -46,7 +46,13 @@ GHG <- read_excel("Data/GHG_2025-06-12.xlsx",
 Measure <- read_excel("Data/GHG_2025-06-12.xlsx", sheet = 2) %>% 
                 mutate(Start_Time = hms::as_hms(Start_Time),
                        End_Time = hms::as_hms(End_Time),
-                       shade_Per = as.factor(Shade_Per))
+                       Shade_Per = as.factor(Shade_Per),
+                       Replicate = as.factor(Replicate))
+
+
+Light <- read_excel("Data/Mesocosm_lightfield.xlsx") %>% 
+            mutate(Pot_Location = as.numeric(Pot_Location),
+                   Water = as.numeric(Water))
 
 
 # Combine based on run time
@@ -58,10 +64,19 @@ Combo <-
       by = c("TIME" = "Start_Time", "TIME" = "End_Time"),
       match_fun = list(`>=`, `<=`)) 
 
-Combo <- 
+Gasflux <- 
   Combo %>% 
       mutate(Dur = difftime(Combo$TIME, Combo$Start_Time)) %>% # Create a column for runtime 
       filter(!Dur == "NA") # Remove the NA (between measurements and before machine started)
+
+Gasflux <-
+  Gasflux %>% 
+      left_join(Light %>% 
+                  select(c("Pot_Location", "Water")), 
+                  by = c("Current_Location" = "Pot_Location"))
+
+
+## Calculations ----------------------------------------------
 
 # get flux per s for each treatment
 
@@ -74,15 +89,57 @@ Fluxes <-
              CH4flux = (as.numeric(CH4) - lag(as.numeric(CH4), n = 1))) 
 
 
-# Data Exploration 
+# This is a little fine detail, maybe instead we do the slope over the whole incubation...
 
-Combo %>% 
+Slope <- Gasflux %>%
+  filter(Dur < 241) %>% 
+  filter(Dur > 40) %>% 
+  group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>%
+  summarise(
+    CO2_fit = list(lm(as.numeric(CO2) ~ as.numeric(Dur))),
+    CH4_fit = list(lm(as.numeric(CH4) ~ as.numeric(Dur))),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    CO2flux = (map_dbl(CO2_fit, ~ coef(.x)[[2]]))*60,  # slope of CO2 ~ min
+    CH4flux = (map_dbl(CH4_fit, ~ coef(.x)[[2]]))*60   # slope of CH4 ~ min
+  ) %>%
+  select(-CO2_fit, -CH4_fit)
+
+# Average
+
+Slope %>% 
+  ggplot(aes( x = Mesocosm_Treatment, y = CO2flux, color = Shade_Per)) +
+  geom_violin() +
+  facet_wrap(~Shade_Per, scales = "free_y") +
+  theme_bw()
+
+
+## Data Exploration ---------------------------------
+
+# Example of medium treatments 
+
+Gasflux %>% 
   filter(Dur < 241) %>% 
   filter(Dur > 120) %>% 
   filter(Mesocosm_Treatment == "MED") %>% 
-  ggplot(aes( x = Dur, y = CH4, color = Shade_Per)) +
+  ggplot(aes( x = Dur, y = CO2, color = Shade_Per)) +
   geom_point() +
-  facet_wrap(~Replicate, scales = "free_y")
+  facet_wrap(~Replicate, scales = "free_y") +
+  theme_bw()
 
 
-# No MED 2 dark
+Gasflux %>% 
+  filter(Dur < 241) %>%
+  filter(Dur > 120) %>%
+  ggplot(aes( x = Mesocosm_Treatment, y = CO2, fill = Shade_Per)) +
+  geom_violin() +
+  theme_bw()
+
+Gasflux %>% 
+  filter(Dur < 241) %>% 
+  filter(Dur > 120) %>% 
+  ggplot(aes( x = Dur, y = CO2, color = Mesocosm_Treatment)) +
+  geom_point() +
+  facet_wrap(~Shade_Per, scales = "free_y") +
+  theme_bw()
