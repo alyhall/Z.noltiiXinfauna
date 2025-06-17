@@ -120,14 +120,20 @@ Slope %>%
 # Example of medium treatments 
 
 Gasflux %>% 
-  filter(Dur < 241) %>% 
-  filter(Dur > 120) %>% 
-  filter(Mesocosm_Treatment == "MED") %>% 
+  # filter(Dur < 241) %>% 
+  # filter(Dur > 120) %>% 
+  filter(Replicate == "4") %>% 
+  filter(Mesocosm_Treatment == "LOW") %>% 
+  filter(Shade_Per == 100) %>% 
   ggplot(aes( x = Dur, y = CO2, color = Shade_Per)) +
   geom_point() +
   facet_wrap(~Replicate, scales = "free_y") +
   theme_bw()
 
+test <-
+Gasflux %>% 
+  filter(Mesocosm_Treatment == "LOW") %>%
+  filter(Replicate == "4")
 
 Gasflux %>% 
   filter(Dur < 241) %>%
