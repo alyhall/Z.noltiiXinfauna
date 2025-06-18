@@ -1,4 +1,4 @@
-Sampler,Sample_ID,Replicate,Month,Sample_Date,Processing_Date,Biomass_Part,TSC,Tin_Weight,Dry_Weight,Bio_Dry_Weight,Bio_Dry_Weight_m2,Date in / out of oven,Notes
+Sampler,Sample_ID,Replicate,Month,Sample_Date,Processing_Date,Biomass_Part,TSC,Tin_Weight,Dry_Weight,Bio_Dry_Weight,Bio_Dry_Weight_m2,Date_in_out_of_oven,Notes
 AH,SB?,NA,April,27/04/2025,05/06/2025,Below,NA,,,24.9,0.792591617,,Samples in April lacked Sample ID and replicate number
 JW?,NA,NA,April,27/04/2025,13/06/2025,Above,NA,,,101.16,3.220022809,,
 JW?,NA,NA,April,27/04/2025,13/06/2025,Above,NA,,,74.6,2.374591751,,Sandbar

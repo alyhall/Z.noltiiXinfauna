@@ -5,6 +5,8 @@ output: html_notebook
 #Z. Noltii Field Biomass (initial)
 #JW June 2025
 
+
+
 ```{r}
 library(ggplot2)
 library(tidyverse)
@@ -19,12 +21,13 @@ library(readr)
 #mutate(TSC... used to change Total Shoot Count per core (TSC) into TSC per m2
 ```{r}
 
-ABZ <- read.csv("~/Github/Data/Field_Ambient_Seagrass - Lab_Cores.csv", na.strings = c("","NA")) 
+ABZ <- read_csv("Data/Lab_Core.csv", na = c("","NA")) 
 ABZ$Month <- forcats::as_factor(ABZ$Month)
 ABZ$Biomass_Part <- forcats::as_factor(ABZ$Biomass_Part)
 ABZ <- ABZ %>% mutate(TSC=(TSC*(100/pi))) %>% mutate(ID=row_number()) %>% rename("SGP"="Biomass_Part", "BDW"="Bio_Dry_Weight_m2") %>%  select(-Processing_Date, -Sample_Date, -Sampler, -Dry_Weight, -Tin_Weight, -Bio_Dry_Weight, -Date.in...out.of.oven, -Notes)
 ABZ
 ```
+
 
 
 
