@@ -1,0 +1,25 @@
+"1","
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuU3RhdHNUU0MgPC0gQUJaICU+JSBncm91cF9ieShNb250aCkgJT4lIHN1bW1hcmlzZShtZWFuPSBtZWFuKFRTQywgbmEucm09VFJVRSksIHNkID0gc2QoVFNDLCBuYS5ybT1UUlVFKSwgbj1uKCksIHNlPXNkL3NxcnQobikpICU+JSAgbXV0YXRlKElEPTEpXG5TdGF0c1RTQ1xuYGBgIn0= -->
+
+```r
+StatsTSC <- ABZ %>% group_by(Month) %>% summarise(mean= mean(TSC, na.rm=TRUE), sd = sd(TSC, na.rm=TRUE), n=n(), se=sd/sqrt(n)) %>%  mutate(ID=1)
+StatsTSC
+```
+
+<!-- rnb-source-end -->
+"
+"0","```r
+StatsTSC <- ABZ %>% group_by(Month) %>% summarise(mean= mean(TSC, na.rm=TRUE), sd = sd(TSC, na.rm=TRUE), n=n(), se=sd/sqrt(n)) %>%  mutate(ID=1)
+StatsTSC
+```"
+"1","
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MiwibmNvbCI6Niwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIyIMOXIDYiXX19LCJyZGYiOiJVa1JZTXdwWUNnQUFBQU1BQkFNREFBTUZBQUFBQUFWVlZFWXRPQUFBQkFJQUFBQUJBQVFBQ1FBQUFBRjRBQUFERXdBQUFBWUFBQU1OQUFBQUFnQUFBQUVBQUFBQ0FBQUVBZ0FBQUFFQUJBQUpBQUFBQm14bGRtVnNjd0FBQUJBQUFBQUNBQVFBQ1FBQUFBVkJjSEpwYkFBRUFBa0FBQUFEVFdGNUFBQUVBZ0FBQUFFQUJBQUpBQUFBQldOc1lYTnpBQUFBRUFBQUFBRUFCQUFKQUFBQUJtWmhZM1J2Y2dBQUFQNEFBQUFPQUFBQUFrQ0h0UnZHYm1mdFFLVEtKQ3dLSzk4QUFBQU9BQUFBQWtDQ0pxZmJrUndxUUlST1FZSTBtM1VBQUFBTkFBQUFBZ0FBQUJJQUFBQUtBQUFBRGdBQUFBSkFZUnpvdEZKZk5VQnByMVRXS3dPZEFBQUFEZ0FBQUFJLzhBQUFBQUFBQUQvd0FBQUFBQUFBQUFBRUFnQUFBQUVBQkFBSkFBQUFCVzVoYldWekFBQUFFQUFBQUFZQUJBQUpBQUFBQlUxdmJuUm9BQVFBQ1FBQUFBUnRaV0Z1QUFRQUNRQUFBQUp6WkFBRUFBa0FBQUFCYmdBRUFBa0FBQUFDYzJVQUJBQUpBQUFBQWtsRUFBQUVBZ0FBQUFFQUJBQUpBQUFBQ1hKdmR5NXVZVzFsY3dBQUFBMEFBQUFDZ0FBQUFQLy8vLzRBQUFRQ0FBQUQvd0FBQUJBQUFBQUJBQVFBQ1FBQUFBcGtZWFJoTG1aeVlXMWxBQUFBL2dBQUJBSUFBQUFCQUFRQUNRQUFBQWR2Y0hScGIyNXpBQUFDRXdBQUFBWUFBQUFRQUFBQUFRQUVBQWtBQUFBQmNnQUFBQkFBQUFBQkFBUUFDUUFBQUJCMWJtNWhiV1ZrTFdOb2RXNXJMVGsxQUFBQUVBQUFBQUVBQkFBSkFBQUFBM0J1WndBQUFBb0FBQUFCQUFBQUFBQUFBQTBBQUFBQkFBQUFBZ0FBQUEwQUFBQUJBQUFBQmdBQUJBSUFBQVQvQUFBQUVBQUFBQVlBQkFBSkFBQUFCbVZ1WjJsdVpRQUVBQWtBQUFBRmJHRmlaV3dBQkFBSkFBQUFBMlJsZGdBRUFBa0FBQUFPY205M2JtRnRaWE11Y0hKcGJuUUFCQUFKQUFBQUNuSnZkM011ZEc5MFlXd0FCQUFKQUFBQUNtTnZiSE11ZEc5MFlXd0FBQUQrQUFBQS9nPT0ifQ== -->
+
+<div data-pagedtable=\"false\">
+  <script data-pagedtable-source type=\"application/json\">
+{\"columns\":[{\"label\":[\"Month\"],\"name\":[1],\"type\":[\"fctr\"],\"align\":[\"left\"]},{\"label\":[\"mean\"],\"name\":[2],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"sd\"],\"name\":[3],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"n\"],\"name\":[4],\"type\":[\"int\"],\"align\":[\"right\"]},{\"label\":[\"se\"],\"name\":[5],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"ID\"],\"name\":[6],\"type\":[\"dbl\"],\"align\":[\"right\"]}],\"data\":[{\"1\":\"April\",\"2\":\"758.6386\",\"3\":\"580.832\",\"4\":\"18\",\"5\":\"136.9034\",\"6\":\"1\"},{\"1\":\"May\",\"2\":\"2661.0706\",\"3\":\"649.782\",\"4\":\"10\",\"5\":\"205.4791\",\"6\":\"1\"}],\"options\":{\"columns\":{\"min\":{},\"max\":[10],\"total\":[6]},\"rows\":{\"min\":[10],\"max\":[10],\"total\":[2]},\"pages\":{}}}
+  </script>
+</div>
+
+<!-- rnb-frame-end -->
+"

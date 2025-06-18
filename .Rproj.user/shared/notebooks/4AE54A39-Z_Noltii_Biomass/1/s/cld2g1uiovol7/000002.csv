@@ -1,0 +1,25 @@
+"1","
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQUJSMSA8LSBzdWJzZXQoQUJaLCBBQlokTW9udGggIT0gXCJBcHJpbFwiKSAlPiUgc2VsZWN0KC1UU0MsIC1JRCkgICU+JSBwaXZvdF93aWRlciggbmFtZXNfZnJvbSA9IFNHUCwgdmFsdWVzX2Zyb20gPSBCRFcpICU+JSBtdXRhdGUoU2FtcFJlcD0gcGFzdGUoU2FtcGxlX0lELCBSZXBsaWNhdGUpKSAlPiUgbXV0YXRlKFRvdGFsQkRXPUFib3ZlK0JlbG93LCBBQlJhdD0gQWJvdmUvQmVsb3cpICU+JSBncm91cF9ieShNb250aCkgJT4lIHNlbGVjdCgtU2FtcGxlX0lELCAtUmVwbGljYXRlKVxuQUJSMVxuYGBgIn0= -->
+
+```r
+ABR1 <- subset(ABZ, ABZ$Month != \"April\") %>% select(-TSC, -ID)  %>% pivot_wider( names_from = SGP, values_from = BDW) %>% mutate(SampRep= paste(Sample_ID, Replicate)) %>% mutate(TotalBDW=Above+Below, ABRat= Above/Below) %>% group_by(Month) %>% select(-Sample_ID, -Replicate)
+ABR1
+```
+
+<!-- rnb-source-end -->
+"
+"0","```r
+ABR1 <- subset(ABZ, ABZ$Month != \"April\") %>% select(-TSC, -ID)  %>% pivot_wider( names_from = SGP, values_from = BDW) %>% mutate(SampRep= paste(Sample_ID, Replicate)) %>% mutate(TotalBDW=Above+Below, ABRat= Above/Below) %>% group_by(Month) %>% select(-Sample_ID, -Replicate)
+ABR1
+```"
+"1","
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjUsIm5jb2wiOjYsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNSDDlyA2Il0sIkdyb3VwcyI6WyJNb250aCBbMV0iXX19LCJyZGYiOiJVa1JZTXdwWUNnQUFBQU1BQkFNREFBTUZBQUFBQUFWVlZFWXRPQUFBQkFJQUFBQUJBQVFBQ1FBQUFBRjRBQUFERXdBQUFBWUFBQU1OQUFBQUJRQUFBQUlBQUFBQ0FBQUFBZ0FBQUFJQUFBQUNBQUFFQWdBQUFBRUFCQUFKQUFBQUJteGxkbVZzY3dBQUFCQUFBQUFDQUFRQUNRQUFBQVZCY0hKcGJBQUVBQWtBQUFBRFRXRjVBQUFFQWdBQUFBRUFCQUFKQUFBQUJXTnNZWE56QUFBQUVBQUFBQUVBQkFBSkFBQUFCbVpoWTNSdmNnQUFBUDRBQUFBT0FBQUFCVUF6YlN2N01JMW5RQ0dkZ2thZlZFeEFKcUcvelFvSmJrQXltSDFvQ3F0VlFESG0yUFQ1TzhFQUFBQU9BQUFBQlVBb2gybnBKOHhOUUNINlo0bmFrbVpBSXJ4WUk2MkVNa0F5M0IvVnMxQlBRQ3Z5bG5BWmJZOEFBQUFRQUFBQUJRQUVBQWtBQUFBRlFrbFBJRFFBQkFBSkFBQUFCVUpKVHlBeUFBUUFDUUFBQUFWQ1NVOGdOUUFFQUFrQUFBQUZRa2xQSURFQUJBQUpBQUFBQlVKSlR5QXpBQUFBRGdBQUFBVkFQN0RnNzhSemprQXh5L1RvUFBOWlFEU3ZDL2hieHRCQVFycE9udDc5MGtBLzRDUXRCZktJQUFBQURnQUFBQVUvK1ZmbkJLbTVaRC92V3FiTWhIK0hQL05UeElCTGlBby83NDArTEl6UCtELzBmMXZKaGRWcUFBQUVBZ0FBQS84QUFBQVFBQUFBQVFBRUFBa0FBQUFLWkdGMFlTNW1jbUZ0WlFBQUJBSUFBQUFCQUFRQUNRQUFBQWx5YjNjdWJtRnRaWE1BQUFBTkFBQUFBb0FBQUFELy8vLzdBQUFFQWdBQUFBRUFCQUFKQUFBQUJXNWhiV1Z6QUFBQUVBQUFBQVlBQkFBSkFBQUFCVTF2Ym5Sb0FBUUFDUUFBQUFWQlltOTJaUUFFQUFrQUFBQUZRbVZzYjNjQUJBQUpBQUFBQjFOaGJYQlNaWEFBQkFBSkFBQUFDRlJ2ZEdGc1FrUlhBQVFBQ1FBQUFBVkJRbEpoZEFBQUFQNEFBQVFDQUFBQUFRQUVBQWtBQUFBSGIzQjBhVzl1Y3dBQUFoTUFBQUFHQUFBQUVBQUFBQUVBQkFBSkFBQUFBWElBQUFBUUFBQUFBUUFFQUFrQUFBQVFkVzV1WVcxbFpDMWphSFZ1YXkwNU9RQUFBQkFBQUFBQkFBUUFDUUFBQUFOd2JtY0FBQUFLQUFBQUFRQUFBQUFBQUFBTkFBQUFBUUFBQUFVQUFBQU5BQUFBQVFBQUFBWUFBQVFDQUFBRi93QUFBQkFBQUFBR0FBUUFDUUFBQUFabGJtZHBibVVBQkFBSkFBQUFCV3hoWW1Wc0FBUUFDUUFBQUFOa1pYWUFCQUFKQUFBQURuSnZkMjVoYldWekxuQnlhVzUwQUFRQUNRQUFBQXB5YjNkekxuUnZkR0ZzQUFRQUNRQUFBQXBqYjJ4ekxuUnZkR0ZzQUFBQS9nQUFBUDQ9In0= -->
+
+<div data-pagedtable=\"false\">
+  <script data-pagedtable-source type=\"application/json\">
+{\"columns\":[{\"label\":[\"Month\"],\"name\":[1],\"type\":[\"fctr\"],\"align\":[\"left\"]},{\"label\":[\"Above\"],\"name\":[2],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"Below\"],\"name\":[3],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"SampRep\"],\"name\":[4],\"type\":[\"chr\"],\"align\":[\"left\"]},{\"label\":[\"TotalBDW\"],\"name\":[5],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"ABRat\"],\"name\":[6],\"type\":[\"dbl\"],\"align\":[\"right\"]}],\"data\":[{\"1\":\"May\",\"2\":\"19.426452\",\"3\":\"12.264480\",\"4\":\"BIO 4\",\"5\":\"31.69093\",\"6\":\"1.5839606\"},{\"1\":\"May\",\"2\":\"8.807635\",\"3\":\"8.989071\",\"4\":\"BIO 2\",\"5\":\"17.79671\",\"6\":\"0.9798159\"},{\"1\":\"May\",\"2\":\"11.315916\",\"3\":\"9.367860\",\"4\":\"BIO 5\",\"5\":\"20.68378\",\"6\":\"1.2079511\"},{\"1\":\"May\",\"2\":\"18.595664\",\"3\":\"18.859861\",\"4\":\"BIO 1\",\"5\":\"37.45552\",\"6\":\"0.9859916\"},{\"1\":\"May\",\"2\":\"17.901748\",\"3\":\"13.973804\",\"4\":\"BIO 3\",\"5\":\"31.87555\",\"6\":\"1.2810934\"}],\"options\":{\"columns\":{\"min\":{},\"max\":[10],\"total\":[6]},\"rows\":{\"min\":[10],\"max\":[10],\"total\":[5]},\"pages\":{}}}
+  </script>
+</div>
+
+<!-- rnb-frame-end -->
+"

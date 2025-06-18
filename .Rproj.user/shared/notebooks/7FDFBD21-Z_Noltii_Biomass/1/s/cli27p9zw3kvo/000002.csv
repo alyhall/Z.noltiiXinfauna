@@ -1,0 +1,25 @@
+"1","
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQUJSMiA8LUFCUjEgJT4lIHN1bW1hcmlzZShUU0U9c2QoVG90YWxCRFcpL3NxcnQobigpKSwgUlNFPXNkKEFCUmF0KS9zcXJ0KG4oKSksIFRvdGFsQkRXPW1lYW4oVG90YWxCRFcpLCBBQlJhdD0gbWVhbihBQlJhdCkgKVxuQUJSMlxuYGBgIn0= -->
+
+```r
+ABR2 <-ABR1 %>% summarise(TSE=sd(TotalBDW)/sqrt(n()), RSE=sd(ABRat)/sqrt(n()), TotalBDW=mean(TotalBDW), ABRat= mean(ABRat) )
+ABR2
+```
+
+<!-- rnb-source-end -->
+"
+"0","```r
+ABR2 <-ABR1 %>% summarise(TSE=sd(TotalBDW)/sqrt(n()), RSE=sd(ABRat)/sqrt(n()), TotalBDW=mean(TotalBDW), ABRat= mean(ABRat) )
+ABR2
+```"
+"1","
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6NSwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyIxIMOXIDUiXX19LCJyZGYiOiJVa1JZTXdwWUNnQUFBQU1BQkFNREFBTUZBQUFBQUFWVlZFWXRPQUFBQkFJQUFBQUJBQVFBQ1FBQUFBRjRBQUFERXdBQUFBVUFBQU1OQUFBQUFRQUFBQUlBQUFRQ0FBQUFBUUFFQUFrQUFBQUdiR1YyWld4ekFBQUFFQUFBQUFJQUJBQUpBQUFBQlVGd2NtbHNBQVFBQ1FBQUFBTk5ZWGtBQUFRQ0FBQUFBUUFFQUFrQUFBQUZZMnhoYzNNQUFBQVFBQUFBQVFBRUFBa0FBQUFHWm1GamRHOXlBQUFBL2dBQUFBNEFBQUFCUUEyeThnUkhmdFVBQUFBT0FBQUFBVCs4Z204ZEpVbTVBQUFBRGdBQUFBRkFPK2FIQzlOcitnQUFBQTRBQUFBQlAvTlMvc0l6OHVzQUFBUUNBQUFBQVFBRUFBa0FBQUFGYm1GdFpYTUFBQUFRQUFBQUJRQUVBQWtBQUFBRlRXOXVkR2dBQkFBSkFBQUFBMVJUUlFBRUFBa0FBQUFEVWxORkFBUUFDUUFBQUFoVWIzUmhiRUpFVndBRUFBa0FBQUFGUVVKU1lYUUFBQVFDQUFBQUFRQUVBQWtBQUFBSmNtOTNMbTVoYldWekFBQUFEUUFBQUFLQUFBQUEvLy8vL3dBQUJBSUFBQVAvQUFBQUVBQUFBQUVBQkFBSkFBQUFDbVJoZEdFdVpuSmhiV1VBQUFEK0FBQUVBZ0FBQUFFQUJBQUpBQUFBQjI5d2RHbHZibk1BQUFJVEFBQUFCZ0FBQUJBQUFBQUJBQVFBQ1FBQUFBRnlBQUFBRUFBQUFBRUFCQUFKQUFBQUVYVnVibUZ0WldRdFkyaDFibXN0TVRBd0FBQUFFQUFBQUFFQUJBQUpBQUFBQTNCdVp3QUFBQW9BQUFBQkFBQUFBQUFBQUEwQUFBQUJBQUFBQVFBQUFBMEFBQUFCQUFBQUJRQUFCQUlBQUFUL0FBQUFFQUFBQUFZQUJBQUpBQUFBQm1WdVoybHVaUUFFQUFrQUFBQUZiR0ZpWld3QUJBQUpBQUFBQTJSbGRnQUVBQWtBQUFBT2NtOTNibUZ0WlhNdWNISnBiblFBQkFBSkFBQUFDbkp2ZDNNdWRHOTBZV3dBQkFBSkFBQUFDbU52YkhNdWRHOTBZV3dBQUFEK0FBQUEvZz09In0= -->
+
+<div data-pagedtable=\"false\">
+  <script data-pagedtable-source type=\"application/json\">
+{\"columns\":[{\"label\":[\"Month\"],\"name\":[1],\"type\":[\"fctr\"],\"align\":[\"left\"]},{\"label\":[\"TSE\"],\"name\":[2],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"RSE\"],\"name\":[3],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"TotalBDW\"],\"name\":[4],\"type\":[\"dbl\"],\"align\":[\"right\"]},{\"label\":[\"ABRat\"],\"name\":[5],\"type\":[\"dbl\"],\"align\":[\"right\"]}],\"data\":[{\"1\":\"May\",\"2\":\"3.712376\",\"3\":\"0.1113653\",\"4\":\"27.9005\",\"5\":\"1.207762\"}],\"options\":{\"columns\":{\"min\":{},\"max\":[10],\"total\":[5]},\"rows\":{\"min\":[10],\"max\":[10],\"total\":[1]},\"pages\":{}}}
+  </script>
+</div>
+
+<!-- rnb-frame-end -->
+"
