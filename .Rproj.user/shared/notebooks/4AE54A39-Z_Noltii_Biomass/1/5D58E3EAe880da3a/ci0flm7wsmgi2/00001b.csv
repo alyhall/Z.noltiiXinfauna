@@ -1,4 +1,0 @@
-"0","Field_Ambient_Seagrass_Lab_Cores <- read_csv(""Data/Field_Ambient_Seagrass - Lab_Cores.csv"")
-"
-"2","Error: 'Data/Field_Ambient_Seagrass - Lab_Cores.csv' does not exist in current working directory ('C:/Users/JNW/Documents/GitHub/Scripts').
-"
