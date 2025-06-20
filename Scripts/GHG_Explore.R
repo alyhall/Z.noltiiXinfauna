@@ -19,7 +19,7 @@
 ##
 ## Licore time was behind real time by 50 s
 ## Chamber Low 4, 100 shadig didn't get 4 mins
-##
+## Found out High 1 Shaded 100% had wrong time input from 11:38 - 11:32 corrected it to 11:42 
 
 ## Packages Needed
 
@@ -86,7 +86,7 @@ Gasflux <-
 Fluxes <- 
     Combo %>%
       group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>%
-      arrange(Mesocosm_Treatment, Replicate, Shade_Per, Dur) %>% 
+      arrange(Mesocosm_Treatment, Replicate, Shade_Per, Dur) %>%  
       # Generating fluxes for gar exchange per s 
       mutate(CO2flux = (as.numeric(CO2) - lag(as.numeric(CO2), n = 1)),
              CH4flux = (as.numeric(CH4) - lag(as.numeric(CH4), n = 1))) 
@@ -163,33 +163,77 @@ Gasflux %>%
   facet_wrap(~Shade_Per, scales = "free_y") +
   theme_bw()
 
-## -JW Test------------
+## JW Sandbox Exploring different relationships
+
+##Just to explore data in excel, creates csv file at working directory :)
+write.csv(Gasflux, "GHG_Gasflux.csv")
+
+#Visualizing Variation-----------------------
+##Creates box plots to view variation without any cutoff in duration 
+Gasflux %>% 
+  ggplot(aes(x=Replicate, y=CO2, color=Shade_Per))+  #x replicate just to view differences between each replicate
+  geom_boxplot()+
+  facet_wrap(~Mesocosm_Treatment)+
+  theme_classic()
+##Same as above but checking how much a delay would work before "settling"?
+Gasflux %>% 
+  filter(Dur>40) %>%  #40s seems to be okay?
+  ggplot(aes(x=Replicate, y=CO2, color=Shade_Per))+ 
+  geom_boxplot()+
+  facet_wrap(~Mesocosm_Treatment)+
+  theme_classic()
+
+
+##Par Exploration-------------
+## To explore if previous PAR may have a reason for some variation 
+Gasflux %>%
+  filter(Dur>40) %>% 
+  ggplot(aes(x=Water, y=CO2, color=Mesocosm_Treatment))+ #Water is PAR reading?
+  geom_point()+
+  geom_line()
+#
+
+## Vitalization of CO2 flux over time for each Different Treatment and Replicate ------------
+
+##High Functional Diversity
+
 
 Gasflux %>% 
-  mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate)) %>% 
-  filter(Dur>50) %>% 
-  filter(Shade_Per== "0") %>% 
-  filter(Mesocosm_Treatment== "CON") %>% 
-  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
-  geom_point() +
-  facet_wrap(~Treat_Rep, scales = "free_y")+
-  theme_classic()
-  
-Gasflux %>% 
-  mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate)) %>% 
-  filter(Dur>120) %>% 
+  filter(Dur>40) %>% 
   filter(Mesocosm_Treatment== "HIGH") %>% 
   ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
   geom_point() +
-  facet_wrap(~Treat_Rep, scales = "free_y")+
+  facet_wrap(~Replicate)+
   theme_classic()
 
-Gasflux %>%
-    filter(Dur>120) %>% 
-    ggplot(aes(x=Dur, y = CO2, color = Mesocosm_Treatment ))+
-    geom_point() +
-    facet_wrap(~Shade_Per, scales = "free_y")+
-    theme_classic()
+##Medium
+Gasflux %>% 
+  filter(Dur>40) %>% 
+  filter(Mesocosm_Treatment== "MED") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  geom_point() +
+  facet_wrap(~Replicate)+
+  theme_classic()
+##Low
+Gasflux %>% 
+
+  filter(Dur>40) %>% 
+  filter(Mesocosm_Treatment== "LOW") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  geom_point() +
+  facet_wrap(~Replicate)+
+  theme_classic()
+##Control
+Gasflux %>% 
+  filter(Dur>40) %>% 
+  filter(Mesocosm_Treatment== "LOW") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  geom_point() +
+  facet_wrap(~Replicate)+
+  theme_classic()
+
+
+
 
 
   
