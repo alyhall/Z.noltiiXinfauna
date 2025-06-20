@@ -120,3 +120,7 @@ ggplot(ABRT, aes(x=Month, y=ABRat, group=ID))+
   geom_errorbar(aes(ymax = ABRat+RSE, ymin=ABRat-RSE, width=0.2))+
   labs(y="A:B")+
   theme_classic()
+
+
+
+
