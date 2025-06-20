@@ -7,12 +7,14 @@
 ## Author: Alyson Hall
 ##
 ## Date Created: 2025-06-12
-## Date Edited: 2025-06-13
+## Date Edited: 2025-06-13 --- 2025-06-20 added new lines without deleting any lines (hopefully) -JW
+##
+## 
 ##
 ## Copyright (c) Alyson Hall, 2025
 ## Email: achall@vims.edu
 ##
-
+##
 ## Notes:
 ##
 ## Licore time was behind real time by 50 s
@@ -64,6 +66,7 @@ Combo <-
       by = c("TIME" = "Start_Time", "TIME" = "End_Time"),
       match_fun = list(`>=`, `<=`)) 
 
+
 Gasflux <- 
   Combo %>% 
       mutate(Dur = difftime(Combo$TIME, Combo$Start_Time)) %>% # Create a column for runtime 
@@ -87,6 +90,16 @@ Fluxes <-
       # Generating fluxes for gar exchange per s 
       mutate(CO2flux = (as.numeric(CO2) - lag(as.numeric(CO2), n = 1)),
              CH4flux = (as.numeric(CH4) - lag(as.numeric(CH4), n = 1))) 
+
+## Combo does not have Dur using Gasflux instead -JW
+Fluxes <- 
+  Gasflux %>%
+  group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>%
+  arrange(Mesocosm_Treatment, Replicate, Shade_Per, Dur) %>% 
+  # Generating fluxes for gar exchange per s 
+  mutate(CO2flux = (as.numeric(CO2) - lag(as.numeric(CO2), n = 1)),
+         CH4flux = (as.numeric(CH4) - lag(as.numeric(CH4), n = 1))) 
+
 
 
 # This is a little fine detail, maybe instead we do the slope over the whole incubation...
@@ -149,3 +162,34 @@ Gasflux %>%
   geom_point() +
   facet_wrap(~Shade_Per, scales = "free_y") +
   theme_bw()
+
+## -JW Test------------
+
+Gasflux %>% 
+  mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate)) %>% 
+  filter(Dur>50) %>% 
+  filter(Shade_Per== "0") %>% 
+  filter(Mesocosm_Treatment== "CON") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  geom_point() +
+  facet_wrap(~Treat_Rep, scales = "free_y")+
+  theme_classic()
+  
+Gasflux %>% 
+  mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate)) %>% 
+  filter(Dur>120) %>% 
+  filter(Mesocosm_Treatment== "HIGH") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  geom_point() +
+  facet_wrap(~Treat_Rep, scales = "free_y")+
+  theme_classic()
+
+Gasflux %>%
+    filter(Dur>120) %>% 
+    ggplot(aes(x=Dur, y = CO2, color = Mesocosm_Treatment ))+
+    geom_point() +
+    facet_wrap(~Shade_Per, scales = "free_y")+
+    theme_classic()
+
+
+  
