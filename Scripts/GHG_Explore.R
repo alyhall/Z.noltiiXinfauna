@@ -168,10 +168,16 @@ Gasflux %>%
   facet_wrap(~Shade_Per, scales = "free_y") +
   theme_bw()
 
-## JW Sandbox Exploring different relationships--------
+## JW Sandbox--------
 
-##Just to explore data in excel, creates csv file at working directory
-write.csv(Gasflux, "GHG_Gasflux.csv")
+#Creates csv from Fluxes dataset with Duration cutoff point based on settling point (See chunk Visualizing Variation 179-219)
+  Fluxes %>% 
+  filter(Dur > 60) %>% 
+  mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate)) %>% 
+  write.csv("Gasflux2.csv") #utilized in GHG-Testing.R
+
+
+Gasflux2 <- read.csv("Data/Gasflux2.csv") #added FD metric just to see if it may explain some variation?
 
 #-Visualizing Variation-----
 
@@ -215,7 +221,7 @@ Gasflux %>%
 
 ##Par Exploration-------------
 ## To explore if previous PAR may have a reason for some variation 
-Gasflux %>%
+Fluxes %>%
   filter(Dur>60) %>% 
   ggplot(aes(x=Water, y=CO2, color=Mesocosm_Treatment))+ 
   geom_point()+
@@ -397,14 +403,36 @@ Gasflux %>%
   geom_point() +
   theme_classic()
 
-#ANOVA----------
-Gasflux2 <-
-  Gasflux %>% 
-  filter(Dur > 60) %>% 
-  mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate))
- 
+##Functional Diversity?? ----
+
+
+Gasflux2 %>%  
+  filter(Mesocosm_Treatment!="CON") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=FuncDivRich))+
+  geom_point()+
+  scale_color_gradient(low = "red", high = "green")+ 
+  facet_wrap(~Mesocosm_Treatment)
+
+
+Gasflux2 %>%  
+  filter(Mesocosm_Treatment!="CON") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=FuncDipersion))+
+  geom_point()+
+  scale_color_gradient(low = "red", high = "green")+ 
+  facet_wrap(~Mesocosm_Treatment)
   
-write.csv(Gasflux2, "Gasflux2.csv")
+Gasflux2 %>%  
+  filter(Mesocosm_Treatment!="CON") %>% 
+  ggplot(aes(x=Dur, y=CH4, color=FuncDivRich))+
+  geom_point()+
+  scale_color_gradient(low = "red", high = "green")+ 
+  facet_wrap(~Mesocosm_Treatment)
 
 
+Gasflux2 %>%  
+  filter(Mesocosm_Treatment!="CON") %>% 
+  ggplot(aes(x=Dur, y=CH4, color=FuncDipersion))+
+  geom_point()+
+  scale_color_gradient(low = "red", high = "green")+ 
+  facet_wrap(~Mesocosm_Treatment) 
   
