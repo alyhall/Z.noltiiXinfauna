@@ -11,7 +11,7 @@
 ##
 ## 
 ##
-## Copyright (c) Alyson Hall, 2025
+## Copyright (c) Alyson Hall, 2025 
 ## Email: achall@vims.edu
 ##
 ##
@@ -171,18 +171,40 @@ Gasflux %>%
 ## JW Sandbox--------
 
 #Creates csv from Fluxes dataset with Duration cutoff point based on settling point (See chunk Visualizing Variation 179-219)
-  Fluxes %>% 
-  filter(Dur > 60) %>% 
-  mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate)) %>% 
-  write.csv("Gasflux2.csv") #utilized in GHG-Testing.R
+#Fluxes %>% 
+  #filter(Dur > 60) %>% 
+  #mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate)) %>% 
+  #write.csv("Gasflux2.csv") #utilized in GHG-Testing.R
 
 
-Gasflux2 <- read.csv("Data/Gasflux2.csv") #added FD metric just to see if it may explain some variation?
+Gasflux2 <- read.csv("Data/Gasflux2.csv") #See Notes below
+#manually added different Functional Diversity Metrics, from Mesocosm_t0_Functional_Diversity
+#Volume (dm^3 or L) calculations: Air_Height(dm)*r^2*pi 
+#Air_Height(dm)= Height_Sediment_Bucket - Height_Sediment_Water
+#r estimated based on average height of 25L buckets ~4dm making r ~ 1.41 ? capacity vs volume confuses me slightly -JW
+#
+
+##Using Ideal Gas Law to estimate micromoles of CO2 and nanomoles of CH4 within closed system
+#Pressure Temperature acquired from Cavity Pressure and Temperature changed to Atmo and Kelvin respectively 
+# CO2m = micromoles/L of CO2, CH4m = nanomoles of CH4/L
+Gasflux2 <- 
+  Gasflux2 %>% 
+  mutate(Shade_Per= as.factor(Shade_Per), Replicate= as.factor(Replicate)) %>% 
+  mutate(Mole= ((Pressure*Volume)/(0.08205*Temperature)), CO2m=(CO2*Mole)/Volume, CH4m=(CH4*Mole)/Volume) %>% 
+  #From Chunk 82
+  group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>%
+  arrange(Mesocosm_Treatment, Replicate, Shade_Per, Dur) %>% 
+  mutate(CO2flux2 = (as.numeric(CO2m) - lag(as.numeric(CO2m), n = 1)),
+         CH4flux2 = (as.numeric(CH4m) - lag(as.numeric(CH4m), n = 1))) 
+  
+##Did a lot of work to find out this does not change things :(
 
 #-Visualizing Variation-----
 
+ 
 
-#Visualizing variation of CO2 Flux for each run to look for a good settling point
+  
+  #Visualizing variation of CO2 Flux for each run to look for a good settling point Approximately 60s
 Fluxes %>% 
   ggplot(aes(x=Replicate, y=CO2flux, color=Shade_Per))+  
   geom_boxplot()+
@@ -190,65 +212,99 @@ Fluxes %>%
   theme_classic()
   
 Fluxes %>%  
-  filter(Dur>60) %>%  #60s seems to be okay?
+  filter(Dur>60) %>%
   ggplot(aes(x=Replicate, y=CO2flux, color=Shade_Per))+ 
   geom_boxplot()+
   facet_wrap(~Mesocosm_Treatment)+
   theme_classic()
 #Visualizing variation of CH4 Flux for each run to look for a good settling point
-Fluxes %>% 
+Gasflux %>% 
   ggplot(aes(x=Replicate, y=CH4flux, color=Shade_Per))+  
   geom_boxplot()+
   facet_wrap(~Mesocosm_Treatment)+
   theme_classic()
 
-Fluxes %>%  
-  filter(Dur>60) %>%  #60s seems to be okay?
+Gasflux %>% 
+  filter(Dur>60) %>% 
   ggplot(aes(x=Replicate, y=CH4flux, color=Shade_Per))+ 
   geom_boxplot()+
   facet_wrap(~Mesocosm_Treatment)+
   theme_classic()
 
-Gasflux %>% 
-  filter(Dur>60) %>% 
-  ggplot(aes(x=Replicate, y=CH4, color=Shade_Per))+ 
-  geom_boxplot()+
-  facet_wrap(~Mesocosm_Treatment)+
-  theme_classic()
 
-Gasflux %>% 
-  ggplot
-
-##Par Exploration-------------
+##Par & Epiphytes Exploration-------------
 ## To explore if previous PAR may have a reason for some variation 
-Fluxes %>%
-  filter(Dur>60) %>% 
-  ggplot(aes(x=Water, y=CO2, color=Mesocosm_Treatment))+ 
+Gasflux2 %>%
+  ggplot(aes(x=Water, y=CO2m, color=Mesocosm_Treatment))+ 
   geom_point()+
-  geom_line()
+  geom_line()+
 
-Gasflux %>%
-  filter(Dur>60) %>% 
-  filter(Mesocosm_Treatment== "High") %>% 
-  ggplot(aes(x=Water, y=CO2))+ 
-  geom_point()
+Gasflux2 %>% 
+  mutate(Epiphytes=Epi+GA) %>% 
+  ggplot(aes(x=Replicate, y=CO2m, colour = Epiphytes))+
+  geom_point()+
+  facet_wrap(~Mesocosm_Treatment)
+  
+Gasflux2 %>% 
+  mutate(Epiphytes=Epi+GA) %>% 
+  ggplot(aes(x=Replicate, y=CO2m, colour = Epiphytes))+
+  geom_point()+
+  facet_wrap(~Mesocosm_Treatment)
+
+
   
 
-
-Fluxes %>% ## 0% shaded run, viewing variation in CO2Flux ### No connection to Par
+Gasflux2 %>% ## 0% shaded run, viewing variation in CO2Flux ### No connection to PAR?
   filter(Dur>60) %>% 
   filter(Shade_Per == "0") %>% 
-  ggplot(aes(x=Replicate, y=CO2flux, color=Water))+ 
+  ggplot(aes(x=Replicate, y=CO2flux2, color=Water))+ 
   scale_color_gradient(low = "red", high = "green")+
   geom_boxplot()+
   facet_wrap(~Mesocosm_Treatment)
-Fluxes %>%
+Gasflux2 %>%
   filter(Dur>60) %>% 
   filter(Shade_Per == "100") %>% 
-  ggplot(aes(x=Replicate, y=CO2flux, color=Water))+ 
+  ggplot(aes(x=Replicate, y=CO2flux2, color=Water))+ 
   scale_color_gradient(low = "red", high = "green")+
   geom_boxplot()+
   facet_wrap(~Mesocosm_Treatment)
+
+Gasflux2 %>% ## 0% shaded run, viewing variation in CH4Flux ### No connection to PAR?
+  filter(Dur>60) %>% 
+  filter(Shade_Per == "0") %>% 
+  ggplot(aes(x=Replicate, y=CH4flux2, color=Water))+ 
+  scale_color_gradient(low = "red", high = "green")+
+  geom_boxplot()+
+  facet_wrap(~Mesocosm_Treatment)
+Gasflux2 %>%
+  filter(Dur>60) %>% 
+  filter(Shade_Per == "100") %>% 
+  ggplot(aes(x=Replicate, y=CH4flux2, color=Water))+ 
+  scale_color_gradient(low = "red", high = "green")+
+  geom_boxplot()+
+  facet_wrap(~Mesocosm_Treatment)
+
+Gasflux2 %>% 
+  mutate(Epiphytes=Epi+GA) %>% 
+  filter(Mesocosm_Treatment == "CON") %>%  ##
+  ggplot(aes(x=Epiphytes, y=CO2, color=Water))+ 
+  scale_color_gradient(low = "red", high = "green")+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+Gasflux2 %>% 
+  mutate(Epiphytes=Epi+GA) %>% 
+  filter(Mesocosm_Treatment == "HIGH") %>% 
+  ggplot(aes(x=Epiphytes, y=CO2, color=Water))+ 
+  scale_color_gradient(low = "red", high = "green")+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+Gasflux2 %>% 
+  mutate(Epiphytes=Epi+GA) %>% 
+  filter(Mesocosm_Treatment == "MED") %>% 
+  ggplot(aes(x=Epiphytes, y=CO2, color=Water))+ 
+  scale_color_gradient(low = "red", high = "green")+
+  geom_point()+
+  facet_wrap(~Shade_Per)
 
 
 
@@ -256,34 +312,40 @@ Fluxes %>%
 
 ##High Functional Diversity
 #CO2
-Gasflux %>% 
-  filter(Dur>60) %>% 
+Gasflux2 %>% 
   filter(Mesocosm_Treatment== "HIGH") %>% 
   ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
   geom_point() +
   facet_wrap(~Replicate)+
   theme_classic()
-
-Fluxes %>% 
+Gasflux2 %>% 
   filter(Dur>60) %>% 
   filter(Mesocosm_Treatment== "HIGH") %>% 
-  ggplot(aes(x=Dur, y=CO2flux, color=Shade_Per))+
+  ggplot(aes(x=Dur, y=CO2m, color=Shade_Per))+
+  geom_point() +
+  facet_wrap(~Replicate)+
+  theme_classic()
+
+Gasflux2 %>% 
+  filter(Dur>60) %>% 
+  filter(Mesocosm_Treatment== "HIGH") %>% 
+  ggplot(aes(x=Dur, y=CO2flux2, color=Shade_Per))+
   geom_point() +
   facet_wrap(~Replicate)+
   theme_classic()
 #CH4
-Gasflux %>% 
+Gasflux2 %>% 
   filter(Dur>60) %>% 
   filter(Mesocosm_Treatment== "HIGH") %>% 
-  ggplot(aes(x=Dur, y=CH4, color=Shade_Per))+
+  ggplot(aes(x=Dur, y=CH4m, color=Shade_Per))+
   geom_point() +
   facet_wrap(~Replicate)+
   theme_classic()
 
-Fluxes %>% 
+Gasflux2 %>% 
   filter(Dur>60) %>% 
   filter(Mesocosm_Treatment== "HIGH") %>% 
-  ggplot(aes(x=Dur, y=CH4flux, color=Shade_Per))+
+  ggplot(aes(x=Dur, y=CH4flux2, color=Shade_Per))+
   geom_point() +
   facet_wrap(~Replicate)+
   theme_classic()
@@ -405,34 +467,48 @@ Gasflux %>%
 
 ##Functional Diversity?? ----
 
-
-Gasflux2 %>%  
+Gasflux2 %>% 
   filter(Mesocosm_Treatment!="CON") %>% 
-  ggplot(aes(x=Dur, y=CO2, color=FuncDivRich))+
+  ggplot(aes(x=Dur, y=CO2m, color=FuncDivRich)) +
   geom_point()+
-  scale_color_gradient(low = "red", high = "green")+ 
+  facet_wrap(~Mesocosm_Treatment)
+
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment!="CON") %>% 
+  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
+  geom_point()+
   facet_wrap(~Mesocosm_Treatment)
 
 
-Gasflux2 %>%  
-  filter(Mesocosm_Treatment!="CON") %>% 
-  ggplot(aes(x=Dur, y=CO2, color=FuncDipersion))+
-  geom_point()+
-  scale_color_gradient(low = "red", high = "green")+ 
-  facet_wrap(~Mesocosm_Treatment)
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="HIGH") %>% 
+  ggplot(aes(x=Dur, y=CO2m, color=FuncDivRich)) +
+  geom_point()
+
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="LOW") %>% 
+  ggplot(aes(x=Dur, y=CO2m, color=FuncDivRich)) +
+  geom_point()
+
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="MED") %>% 
+  ggplot(aes(x=Dur, y=CO2m, color=FuncDivRich)) +
+  geom_point()
+
+
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="HIGH") %>% 
+  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
+  geom_point()
+
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="LOW") %>% 
+  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
+  geom_point()
+
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="MED") %>% 
+  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
+  geom_point()
   
-Gasflux2 %>%  
-  filter(Mesocosm_Treatment!="CON") %>% 
-  ggplot(aes(x=Dur, y=CH4, color=FuncDivRich))+
-  geom_point()+
-  scale_color_gradient(low = "red", high = "green")+ 
-  facet_wrap(~Mesocosm_Treatment)
 
-
-Gasflux2 %>%  
-  filter(Mesocosm_Treatment!="CON") %>% 
-  ggplot(aes(x=Dur, y=CH4, color=FuncDipersion))+
-  geom_point()+
-  scale_color_gradient(low = "red", high = "green")+ 
-  facet_wrap(~Mesocosm_Treatment) 
-  
