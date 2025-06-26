@@ -200,7 +200,15 @@ Gasflux2 <-
 ##Did a lot of work to find out this does not change things :(
 
 #-Visualizing Variation-----
-
+Gasflux2 %>% 
+  mutate(sdCO2= sd(CO2), sdCH4 = sd(CH4)) %>% 
+  group_by(Mesocosm_Treatment, Replicate) %>% 
+  mutate(MeanCO2= mean(CO2), MeanCH4 = mean(CH4)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x=Replicate, y=MeanCO2))+
+  geom_point()+
+  geom_errorbar(aes(ymax=MeanCO2+sdCO2, ymin=MeanCO2-sdCO2))+
+  facet_wrap(~Mesocosm_Treatment)
  
 
   
@@ -512,3 +520,20 @@ Gasflux2 %>%
   geom_point()
   
 
+
+
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="LOW") %>% 
+  ggplot(aes(x=FunXaxis, y=FunYaxis, color=CO2))+
+  geom_point()+
+  facet_wrap(~Replicate)
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="MED") %>% 
+  ggplot(aes(x=FunXaxis, y=FunYaxis, color=CO2))+
+  geom_point()+
+  facet_wrap(~Replicate)
+Gasflux2 %>% 
+  filter(Mesocosm_Treatment=="HIGH") %>% 
+  ggplot(aes(x=FunXaxis, y=FunYaxis, color=CO2))+
+  geom_point()+
+  facet_wrap(~Replicate)
