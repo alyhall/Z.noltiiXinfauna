@@ -223,7 +223,7 @@ Gasflux2 <-
   
 ##Did a lot of work to find out this does not change things :(
 
-#-Visualizing Variation-----
+###-Visualizing Variation-----
 
 
 #purpose is to find outliers within Treatments
@@ -270,17 +270,27 @@ Fluxes %>%
   theme_classic()
 
 
-##Par & Epiphytes Exploration-------------
+###Par & Epiphytes Exploration-------------
 ## To explore if previous PAR may have a reason for some variation 
 
 
-Gasflux %>%
+
+Gasflux2 %>% 
+  ggplot(aes(x=as.factor(Current_Location), y=CO2, color=Mesocosm_Treatment))+
+  geom_point()
+
+Gasflux2 %>%
   filter(Dur>60) %>% 
+  
   ggplot(aes(x=Water, y=CO2, color=Mesocosm_Treatment))+ 
   geom_point()+
   geom_line() #Water = PAR reading within Mesocosm at previous location
 
-
+Gasflux2 %>%
+  filter(Dur>60) %>% 
+  ggplot(aes(x=Water, y=CH4m, color=Mesocosm_Treatment))+  
+  geom_point()+
+  geom_line()
 
 Gasflux %>%  #attempted to see if EPIPHYTES could have caused variation in CO2
   filter(Dur>60 ) %>% 
@@ -298,13 +308,15 @@ Gasflux %>%
 
   
 
+
+
 Fluxes %>% ## 0% shaded run, viewing variation in CO2Flux ### No connection to PAR?
   filter(Dur>60) %>% 
   filter(Shade_Per == "0") %>% 
   ggplot(aes(x=Replicate, y=CO2flux, color=Water))+ 
   scale_color_gradient(low = "red", high = "green")+
   geom_boxplot()+
-  facet_wrap(~Mesocosm_Treatment)
+  facet_wrap(~Mesocosm_Treatment, scales= "free_y")
 
 Fluxes %>% #100% shaded run Flux in CO2? # no connection?
   filter(Dur>60) %>% 
@@ -333,7 +345,7 @@ Fluxes %>% #100% shaded run CH4 flux
   facet_wrap(~Mesocosm_Treatment)
 
 
-## Vitalization of CO2 flux over time for each Different Treatment and Replicate-------
+### Vitalization of CO2 flux over time for each Different Treatment and Replicate-------
 
 ##High Functional Diversity
 #CO2
@@ -342,15 +354,16 @@ Gasflux %>%
   filter(Mesocosm_Treatment== "HIGH") %>% 
   ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
   geom_point() +
-  facet_wrap(~Replicate)+
+  facet_wrap(~Replicate, scales = "free_y")+
   theme_classic()
+
 
 Fluxes %>% 
   filter(Dur>60) %>% 
   filter(Mesocosm_Treatment== "HIGH") %>% 
   ggplot(aes(x=Dur, y=CO2flux, color=Shade_Per))+
   geom_point() +
-  facet_wrap(~Replicate)+
+  facet_wrap(~Replicate, scales = "free_y")+
   theme_classic()
 
 #CH4
@@ -359,7 +372,7 @@ Gasflux %>%
   filter(Mesocosm_Treatment== "HIGH") %>% 
   ggplot(aes(x=Dur, y=CH4, color=Shade_Per))+
   geom_point() +
-  facet_wrap(~Replicate)+
+  facet_wrap(~Replicate, scales = "free_y")+
   theme_classic()
 
 Gasflux2 %>% 
@@ -376,7 +389,7 @@ Gasflux %>%
   filter(Mesocosm_Treatment== "MED") %>% 
   ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
   geom_point() +
-  facet_wrap(~Replicate)+
+  facet_wrap(~Replicate, scales = "free_y")+
   theme_classic()
 
 Fluxes %>% 
@@ -410,7 +423,7 @@ Gasflux %>%
   filter(Mesocosm_Treatment== "LOW") %>% 
   ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
   geom_point() +
-  facet_wrap(~Replicate)+
+  facet_wrap(~Replicate, scales = "free_y")+
   theme_classic()
 
 Fluxes %>% 
@@ -443,7 +456,7 @@ Gasflux %>%
   filter(Mesocosm_Treatment== "CON") %>% 
   ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
   geom_point() +
-  facet_wrap(~Replicate)+
+  facet_wrap(~Replicate,scales = "free_y")+
   theme_classic()
 Fluxes %>% 
   filter(Dur>60) %>% 
@@ -458,7 +471,7 @@ Gasflux %>%
   filter(Mesocosm_Treatment== "CON") %>% 
   ggplot(aes(x=Dur, y=CH4, color=Shade_Per))+
   geom_point() +
-  facet_wrap(~Replicate)+
+  facet_wrap(~Replicate, scales = "free_y")+
   theme_classic()
 Fluxes %>% 
   filter(Dur>60) %>% 
@@ -496,18 +509,18 @@ Gasflux %>%
   theme_classic()
 
 Gasflux %>% 
-  filter(Dur>60) %>% 
+  filter(Dur>20) %>% 
   filter(Mesocosm_Treatment== "LOW") %>%
   filter(Replicate == "4") %>% 
   ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
   geom_point() +
   theme_classic()
 
-##Functional Diversity?? ----
+###Functional Diversity?? ----
 
 Gasflux2 %>% 
   # filter(Mesocosm_Treatment!="CON") %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDivRich)) +
+  ggplot(aes(x=Dur, y=CO2, color=FuncDivRich)) +
   geom_point()+
   facet_wrap(~Mesocosm_Treatment)
 
@@ -556,10 +569,9 @@ Gasflux2 %>%
   facet_wrap(~Mesocosm_Treatment)
 
 Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="LOW") %>% 
   ggplot(aes(x=FunXaxis, y=FunYaxis, color=CO2))+
-  geom_point()+
-  facet_wrap(~Replicate)
+  geom_point(size=5)+
+  facet_wrap(~Mesocosm_Treatment)
 Gasflux2 %>% 
   filter(Mesocosm_Treatment=="MED") %>% 
   ggplot(aes(x=FunXaxis, y=FunYaxis, color=CO2))+
@@ -571,6 +583,38 @@ Gasflux2 %>%
   geom_point()+
   facet_wrap(~Replicate)
 
+### By Species------------------------------------
+
+
+Mesocosm_Key <- read.csv("Data/Mesocosm_Community_Key.csv")
+
+
+SpeciesTest <-
+  full_join(Mesocosm_Key, Gasflux2, 
+            by = c("Infaunal_Community_ID" = "Treat_Rep")) %>% 
+  filter(Mesocosm_Treatment != "CON")
+
+SpeciesTest %>% 
+  ggplot(aes(x=Worm.Percentage, y=CO2, color=Mesocosm_Treatment))+
+  geom_point()
+
+
+SpeciesTest %>% 
+  ggplot(aes(x=Bivalve.Percentage, y=CO2, colour = Mesocosm_Treatment))+
+  geom_point()
+
+SpeciesTest %>% 
+  ggplot(aes(y=CO2, x=Total.Worm, color= Mesocosm_Treatment))+
+  geom_point()
+
+SpeciesTest %>% 
+  group_by(Infaunal_Community_ID) %>%
+  filter(Shade_Per =="0") %>% 
+  
+  mutate(Absent=if_else(!is.na(Arenicola), "Arenicola", "Absent")) %>% 
+ ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
+  geom_boxplot()+
+  ylim(-1,1)
 
 #### Figs for Katie --------------------------------
 
