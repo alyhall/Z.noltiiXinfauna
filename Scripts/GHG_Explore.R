@@ -118,7 +118,7 @@ Slope <- Gasflux %>%
   # Now our units are in ppm CO2 per hour per m2
 
 Slope <- Gasflux2 %>% 
-  filter(Dur > 60, Dur < 241) %>% 
+  filter(Dur > 100, Dur < 241) %>% 
   group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>% 
   summarise(
     CO2_slope = coef(lm(CO2 ~ Dur))[2],   # β₁ for CO₂
@@ -199,7 +199,7 @@ Gasflux2 <- read.csv("Data/Gasflux2.csv") #See Notes below
 #manually added different Functional Diversity Metrics, from Mesocosm_t0_Functional_Diversity
 #Volume (dm^3 or L) calculations: Air_Height(dm)*r^2*pi 
 #Air_Height(dm)= Height_Sediment_Bucket - Height_Sediment_Water
-#r estimated based on average height of 25L buckets ~4dm making r ~ 1.41 ? capacity vs volume confuses me slightly -JW
+#!!! R = 17.5cm Total H = 39cm V=37.5224 L
 #
 
 ##Using Ideal Gas Law to estimate micromoles of CO2 and nanomoles of CH4 within closed system
@@ -221,7 +221,7 @@ Gasflux2 <-
   mutate(CO2flux2 = (CO2flux2*60*60) / (314.159 / 1e4),
          CH4flux2 = (CH4flux2*60*60) / (314.159 / 1e4))
   
-##Did a lot of work to find out this does not change things :(
+
 
 ###-Visualizing Variation-----
 
@@ -229,10 +229,10 @@ Gasflux2 <-
 #purpose is to find outliers within Treatments
 
 
-Gasflux2 %>%  #Identifies among Mesocosm treatments which 
-  mutate(sdCO2= sd(CO2), sdCH4 = sd(CH4)) %>% 
+Gasflux2 %>%  #Identifies outliers? among Mesocosm treatments which 
+  mutate(sdCO2= sd(CO2m), sdCH4 = sd(CH4m)) %>% 
   group_by(Mesocosm_Treatment, Replicate) %>% 
-  mutate(MeanCO2= mean(CO2), MeanCH4 = mean(CH4)) %>% 
+  mutate(MeanCO2= mean(CO2m), MeanCH4 = mean(CH4m)) %>% 
   ungroup() %>% 
   ggplot(aes(x=Replicate, y=MeanCO2))+
   geom_point()+
@@ -241,6 +241,15 @@ Gasflux2 %>%  #Identifies among Mesocosm treatments which
  
 
   
+Gasflux2 %>% 
+  mutate(Replicate= as.factor(Replicate), MicroCO2 = (MicroCO2/Volume)) %>% 
+  
+  ggplot(aes(y=MicroCO2, x=Replicate))+
+  geom_boxplot()+
+  facet_wrap(~Mesocosm_Treatment)
+  
+
+
   #Visualizing variation of CO2 Flux per each run to look for a good settling point Approximately 60s
 Fluxes %>% 
   ggplot(aes(x=Replicate, y=CO2flux, color=Shade_Per))+  
@@ -591,7 +600,7 @@ Mesocosm_Key <- read.csv("Data/Mesocosm_Community_Key.csv")
 
 SpeciesTest <-
   full_join(Mesocosm_Key, Gasflux2, 
-            by = c("Infaunal_Community_ID" = "Treat_Rep")) %>% 
+            by = c("Infaunal_Community_ID" = "Treat_Rep")) %>%
   filter(Mesocosm_Treatment != "CON")
 
 SpeciesTest %>% 
@@ -605,16 +614,19 @@ SpeciesTest %>%
 
 SpeciesTest %>% 
   ggplot(aes(y=CO2, x=Total.Worm, color= Mesocosm_Treatment))+
-  geom_point()
+  geom_boxplot()
 
 SpeciesTest %>% 
   group_by(Infaunal_Community_ID) %>%
   filter(Shade_Per =="0") %>% 
-  
   mutate(Absent=if_else(!is.na(Arenicola), "Arenicola", "Absent")) %>% 
- ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
-  geom_boxplot()+
-  ylim(-1,1)
+ ggplot(aes(x=Absent, y=CO2, color=Mesocosm_Treatment))+
+  geom_boxplot()
+
+  
+SpeciesTest %>% 
+  group_by()
+
 
 #### Figs for Katie --------------------------------
 
