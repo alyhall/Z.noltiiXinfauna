@@ -43,6 +43,7 @@ GHG <- read_excel("Data/GHG_2025-06-12.xlsx",
                  CH4 = as.numeric(CH4)) 
 
 
+
 # Read in measurements from data sheet
 
 Measure <- read_excel("Data/GHG_2025-06-12.xlsx", sheet = 2) %>% 
@@ -55,6 +56,8 @@ Measure <- read_excel("Data/GHG_2025-06-12.xlsx", sheet = 2) %>%
 Light <- read_excel("Data/Mesocosm_lightfield.xlsx") %>% 
             mutate(Pot_Location = as.numeric(Pot_Location),
                    Water = as.numeric(Water))
+
+
 
 
 # Combine based on run time
@@ -195,6 +198,8 @@ Gasflux %>%
   #write.csv("Gasflux2.csv") #utilized in GHG-Testing.R
 
 
+
+
 Gasflux2 <- read.csv("Data/Gasflux2.csv") #See Notes below
 #manually added different Functional Diversity Metrics, from Mesocosm_t0_Functional_Diversity
 #Volume (dm^3 or L) calculations: Air_Height(dm)*r^2*pi 
@@ -210,7 +215,7 @@ Gasflux2 <- read.csv("Data/Gasflux2.csv") #See Notes below
 Gasflux2 <- 
   Gasflux2 %>% 
   mutate(Shade_Per= as.factor(Shade_Per), Replicate= as.factor(Replicate)) %>% 
-  mutate(Mole= ((Pressure*Volume)/(0.08205*Temperature)), CO2m=(CO2*Mole)/Volume, CH4m=(CH4*Mole)/Volume) %>% 
+  mutate(Mole= ((Pressure*Volume)/(0.08205*Temperature)), CO2m=(CO2*Mole), CH4m=(CH4*Mole)) %>% 
   #Units of CO2m and CH4m 
   #From Chunk 82
   group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>%
@@ -222,6 +227,46 @@ Gasflux2 <-
          CH4flux2 = (CH4flux2*60*60) / (314.159 / 1e4))
   
 
+##Testing out what just moles/s looks like
+TestSlope <-   Gasflux2 %>% 
+  mutate(Shade_Per= as.factor(Shade_Per), Replicate= as.factor(Replicate)) %>% 
+  mutate(Mole= ((Pressure*Volume)/(0.08205*Temperature)), CO2m=(CO2*Mole), CH4m=(CH4*Mole)) %>% #Mole is amount of moles present with each closed chamber, CO2m is amount of CO2 micromoles present with amount of moles of dry gas present
+  #Units of CO2m and CH4m 
+  #From Chunk 82
+  group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>%
+  arrange(Mesocosm_Treatment, Replicate, Shade_Per, Dur) %>% 
+  mutate(CO2flux2 = (as.numeric(CO2m) - lag(as.numeric(CO2m), n = 1)),
+         CH4flux2 = (as.numeric(CH4m) - lag(as.numeric(CH4m), n = 1)))
+
+SlopeTest <- Gasflux2 %>% 
+  filter(Dur > 120, Dur < 241) %>% 
+  group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>% 
+  summarise(
+    CO2_slope = coef(lm(CO2 ~ Dur))[2],   # β₁ for CO₂
+    CH4_slope = coef(lm(CH4 ~ Dur))[2],   # β₁ for CH₄
+    Volume    = first(Volume),            # keep Volume (or any other static columns)
+    .groups   = "drop"
+  )
+  
+SlopeTest <- SlopeTest %>% mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate))
+
+write.csv(SlopeTest, "SlopeTest.csv") #<- creates csv just for slope data
+
+
+
+
+GHGTest <- GHG %>% 
+  mutate(TEST = as.numeric(TIME))
+
+#install.packages("plotly")
+library(plotly)
+
+GHGlook<- GHG %>% 
+  filter(as.numeric(TIME) > 35326, as.numeric(TIME)<54305, CO2<3000, CO2>1100) %>% 
+  ggplot(aes(x=TIME, y=CO2))+
+  geom_point()
+
+ggplotly(GHGlook)
 
 ###-Visualizing Variation-----
 
@@ -525,72 +570,155 @@ Gasflux %>%
   geom_point() +
   theme_classic()
 
-###Functional Diversity?? ----
+###Functional Diversity----
 
-Gasflux2 %>% 
-  # filter(Mesocosm_Treatment!="CON") %>% 
-  ggplot(aes(x=Dur, y=CO2, color=FuncDivRich)) +
+#Funct_Rich = Functional Diversity Richness
+#Func_Disp = Function Dispersion 
+#F_x = X axis of multivariate analysis
+#F_y
+
+####Flux and Functional Diversity metrics----
+SlopeTest <- read.csv("Data/SlopeTest.csv")
+SlopeTest <- SlopeTest %>% filter(Mesocosm_Treatment!="CON") %>% mutate(Shade_Per = as.factor(Shade_Per), CO2_slope= (CO2_slope*60*60)*(100/pi), CH4_slope = ((CH4_slope*60*60)*(100/pi))) #Unit CO2, micromole per m^2 per hr? Unit CH4 nanomole per m^2 per hour?
+
+SlopeTest %>% #Co2 flux ~ Functional Richness
+  ggplot(aes(x=Funct_Rich, y=CO2_slope, color=Shade_Per))+ #colored by shaded and light run
   geom_point()+
-  facet_wrap(~Mesocosm_Treatment)
+  geom_smooth(se=F)
 
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment!="CON") %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
+SlopeTest %>% ##CH4 flux ~ Functional Richness
+  filter(Treat_Rep != "LOW 4") %>%  #removed Low 4 due to being a massive outlier for CH4
+  ggplot(aes(x=Funct_Rich, y=CH4_slope, color=Shade_Per))+
   geom_point()+
-  facet_wrap(~Mesocosm_Treatment)
+  geom_smooth(se=F)
 
-
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="HIGH") %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDivRich)) +
-  geom_point()
-
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="LOW") %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDivRich)) +
-  geom_point()
-
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="MED") %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDivRich)) +
-  geom_point()
-
-
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="HIGH") %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
-  geom_point()
-
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="LOW") %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
-  geom_point()
-
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="MED") %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
-  geom_point()
-  
-# Example with facet_wrap()
-Gasflux2 %>% 
-  ggplot(aes(x=Dur, y=CO2m, color=FuncDipersion)) +
-  geom_point() +
-  facet_wrap(~Mesocosm_Treatment)
-
-Gasflux2 %>% 
-  ggplot(aes(x=FunXaxis, y=FunYaxis, color=CO2))+
-  geom_point(size=5)+
-  facet_wrap(~Mesocosm_Treatment)
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="MED") %>% 
-  ggplot(aes(x=FunXaxis, y=FunYaxis, color=CO2))+
+SlopeTest %>%  #CO2 flux ~ Functional Dispersion
+  ggplot(aes(x=Funct_Disp, y=CO2_slope, color=Shade_Per))+
   geom_point()+
-  facet_wrap(~Replicate)
-Gasflux2 %>% 
-  filter(Mesocosm_Treatment=="HIGH") %>% 
-  ggplot(aes(x=FunXaxis, y=FunYaxis, color=CO2))+
+  geom_smooth(se=F)
+
+SlopeTest %>% #CH4 flux ~ Functional Dispersion
+  filter(Treat_Rep != "LOW 4") %>% 
+  ggplot(aes(x=Funct_Disp, y=CH4_slope, color=Shade_Per))+
   geom_point()+
-  facet_wrap(~Replicate)
+  geom_smooth(se=F)
+
+SlopeTest %>% #CO2 flux ~ Functional Diversity X axis
+  ggplot(aes(x=Fun_X, y=CO2_slope, color=Shade_Per))+
+  geom_point()
+
+SlopeTest %>% #CH4 flux ~ Functional Diversity X axis
+  filter(Treat_Rep != "LOW 4") %>% 
+  ggplot(aes(x=Fun_X, y=CH4_slope, color=Shade_Per))+
+  geom_point()
+
+SlopeTest %>% #CO2 flux ~ Functional Diversity Y axis
+  ggplot(aes(x=Fun_Y, y=CO2_slope, color=Shade_Per))+
+  geom_point()
+
+
+SlopeTest %>% #CH4 flux ~ Functional Diversity Y axis
+  filter(Treat_Rep != "LOW 4") %>% 
+  ggplot(aes(x=Fun_Y, y=CH4_slope, color=Shade_Per))+
+  geom_point()
+
+####Species?-----
+#Utitlizing Functional Richness as explainatory
+#####CO2 flux ~ Functional Richness-----
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Arenicola), "Arenicola", "Absent"))) %>% 
+  ggplot(aes(y=CO2_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Nephtys), "Nephtys", "Absent"))) %>% 
+  ggplot(aes(y=CO2_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Glycera), "Glycera", "Absent"))) %>% 
+  ggplot(aes(y=CO2_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Hediste), "Hediste", "Absent"))) %>% 
+  ggplot(aes(y=CO2_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Mya), "Mya", "Absent"))) %>% 
+  ggplot(aes(y=CO2_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Cerastoderma), "Cerastoderma", "Absent"))) %>% 
+  ggplot(aes(y=CO2_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Scrobicularia), "Scrobicularia", "Absent"))) %>% 
+  ggplot(aes(y=CO2_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+
+SlopeTest %>% 
+  ggplot()
+
+
+#####CH4 flux ~ Functional Richness------
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Arenicola), "Arenicola", "Absent"))) %>% 
+  filter(Treat_Rep!= "LOW 4") %>% 
+  ggplot(aes(y=CH4_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Nephtys), "Nephtys", "Absent"))) %>% 
+  filter(Treat_Rep!= "LOW 4") %>% 
+  ggplot(aes(y=CH4_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Glycera), "Glycera", "Absent"))) %>% 
+  filter(Treat_Rep!= "LOW 4") %>% 
+  ggplot(aes(y=CH4_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Hediste), "Hediste", "Absent"))) %>% 
+  filter(Treat_Rep!= "LOW 4") %>% 
+  ggplot(aes(y=CH4_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Mya), "Mya", "Absent"))) %>% 
+  filter(Treat_Rep!= "LOW 4") %>% 
+  ggplot(aes(y=CH4_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Cerastoderma), "Cerastoderma", "Absent"))) %>% 
+  filter(Treat_Rep!= "LOW 4") %>% 
+  ggplot(aes(y=CH4_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
+SlopeTest %>% 
+  mutate(Absent=as.factor(if_else(!is.na(Scrobicularia), "Scrobicularia", "Absent"))) %>% 
+  filter(Treat_Rep!= "LOW 4") %>% 
+  ggplot(aes(y=CH4_slope, x=Funct_Rich, color=Absent))+
+  geom_point()+
+  facet_wrap(~Shade_Per)
+
 
 ### By Species------------------------------------
 
@@ -598,35 +726,104 @@ Gasflux2 %>%
 Mesocosm_Key <- read.csv("Data/Mesocosm_Community_Key.csv")
 
 
-SpeciesTest <-
+SpeciesTest <- # Raw data from Gasflux2 and Mesocosm Key
   full_join(Mesocosm_Key, Gasflux2, 
             by = c("Infaunal_Community_ID" = "Treat_Rep")) %>%
   filter(Mesocosm_Treatment != "CON")
 
-SpeciesTest %>% 
-  ggplot(aes(x=Worm.Percentage, y=CO2, color=Mesocosm_Treatment))+
-  geom_point()
 
 
-SpeciesTest %>% 
-  ggplot(aes(x=Bivalve.Percentage, y=CO2, colour = Mesocosm_Treatment))+
-  geom_point()
 
-SpeciesTest %>% 
-  ggplot(aes(y=CO2, x=Total.Worm, color= Mesocosm_Treatment))+
-  geom_boxplot()
+##########Loading data
 
-SpeciesTest %>% 
-  group_by(Infaunal_Community_ID) %>%
-  filter(Shade_Per =="0") %>% 
-  mutate(Absent=if_else(!is.na(Arenicola), "Arenicola", "Absent")) %>% 
- ggplot(aes(x=Absent, y=CO2, color=Mesocosm_Treatment))+
-  geom_boxplot()
-
+SpeciesTest2 <- #Species Test 2 uses Slope and Mesocosm Key to see if there is a difference slope of CO2 between species
+  Slope %>% 
+  mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate))
   
-SpeciesTest %>% 
-  group_by()
+SpeciesTest2 <- 
+  full_join(Mesocosm_Key, SpeciesTest2, 
+                         by = c("Infaunal_Community_ID" = "Treat_Rep")) %>%
+  filter(Mesocosm_Treatment != "CON")
 
+
+SpeciesTest2 <- SpeciesTest2 %>% 
+  mutate(Mesocosm_Treatment= factor(Mesocosm_Treatment, levels = c("LOW", "MED", "HIGH")))
+
+######## Seeing if total values of "group" may show pattern?
+
+SpeciesTest2 %>% 
+  mutate(Total.Bivalve = as.factor(Total.Bivalve)) %>% 
+  ggplot(aes(y=CO2flux, x=Mesocosm_Treatment, color= Total.Bivalve))+
+  geom_boxplot()
+
+
+SpeciesTest2 %>% 
+  mutate(Total.Worm = as.factor(Total.Worm)) %>% 
+  ggplot(aes(y=CO2flux, x=Mesocosm_Treatment, color= Total.Worm))+
+  geom_boxplot()
+
+
+SpeciesTest2 %>% 
+  group_by(Infaunal_Community_ID) %>%
+  mutate(Absent=if_else(!is.na(Arenicola), "Arenicola", "Absent")) %>% 
+ ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
+  geom_boxplot()+
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5, aes(fill=Mesocosm_Treatment), position = "dodge")+
+  facet_wrap(~Shade_Per, scale = "free_y")
+
+SpeciesTest2 %>% 
+  group_by(Infaunal_Community_ID) %>% 
+  mutate(Absent=if_else(!is.na(Nephtys), "Nephtys", "Absent")) %>% ##Nephytys 
+  ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
+  geom_boxplot()+
+  facet_wrap(~Shade_Per, scale = "free_y")
+
+
+SpeciesTest2 %>% 
+  mutate(Absent=if_else(!is.na(Glycera), "Glycera", "Absent")) %>% 
+  ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
+  geom_boxplot()+
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5, aes(fill=Mesocosm_Treatment), position = "dodge")+
+  facet_wrap(~Shade_Per, scale = "free_y")
+
+SpeciesTest2 %>% 
+  mutate(Absent=if_else(!is.na(Hediste), "Hediste", "Absent")) %>% 
+  ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
+  geom_boxplot()+
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5, aes(fill=Mesocosm_Treatment), position = "dodge")+
+  facet_wrap(~Shade_Per, scale = "free_y")
+
+SpeciesTest2 %>% 
+  mutate(Absent=if_else(!is.na(Mya), "Mya", "Absent")) %>% 
+  ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
+  geom_boxplot()+
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5, aes(fill=Mesocosm_Treatment), position = "dodge")+
+  facet_wrap(~Shade_Per, scale = "free_y")
+
+
+SpeciesTest2 %>% 
+  mutate(Absent=if_else(!is.na(Cerastoderma), "Cerastoderma", "Absent")) %>% 
+  ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
+  geom_boxplot()+
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5, aes(fill=Mesocosm_Treatment), position = "dodge")+
+  facet_wrap(~Shade_Per, scale = "free_y")
+
+
+SpeciesTest2 %>% 
+  mutate(Absent=if_else(!is.na(Scrobicularia), "Scrobicularia", "Absent")) %>% 
+  ggplot(aes(x=Absent, y=CO2flux, color=Mesocosm_Treatment))+
+  geom_boxplot()+
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5, aes(fill=Mesocosm_Treatment), position = "dodge")+
+  facet_wrap(~Shade_Per, scale = "free_y")
+
+SpeciesTest2 %>% 
+  mutate(Absent=if_else(!is.na(Scrobicularia), "Scrobicularia", "Absent")) %>% 
+  filter(Absent == "Absent") %>% 
+  ggplot(aes(y=CO2flux, x=Mesocosm_Treatment))+
+  geom_boxplot()+
+  geom_boxplot()+
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5, aes(fill=Mesocosm_Treatment), position = "dodge")+
+  facet_wrap(~Shade_Per, scale = "free_y")
 
 #### Figs for Katie --------------------------------
 
