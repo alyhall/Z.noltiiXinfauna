@@ -1,5 +1,5 @@
 Sampler,Sample_ID,Replicate,Month,Sample_Date,Processing_Date,Biomass_Part,TSC,Tin_Weight,Dry_Weight,Bio_Dry_Weight,Bio_Dry_Weight_m2,Date_in_out_of_oven,Notes
-AH,SB?,NA,April,27/04/2025,05/06/2025,Below,NA,,,24.9,0.792591617,,Samples in April lacked Sample ID and replicate number
+AH,SB?,NA,April,27/04/2025,5/6/2025,Below,NA,,,24.9,0.792591617,,Samples in April lacked Sample ID and replicate number
 JW?,NA,NA,April,27/04/2025,13/06/2025,Above,NA,,,101.16,3.220022809,,
 JW?,NA,NA,April,27/04/2025,13/06/2025,Above,NA,,,74.6,2.374591751,,Sandbar
 JW?,NA,NA,April,27/04/2025,13/06/2025,Above,NA,,,20.9,0.665267662,,
@@ -27,3 +27,15 @@ JW?,BIO,3,May,28/05/2025,13/06/2025,Above,100,,,562.4,17.901748,,
 JW?,BIO,5,May,28/05/2025,13/06/2025,Below,73,,,294.3,9.36785995,,
 JW?,BIO,2,May,28/05/2025,13/06/2025,Above,51,,,276.7,8.807634551,,
 JW?,BIO,3,May,28/05/2025,13/06/2025,Below,100,,,439,13.973804,,
+KC,ZN,5,June,24/06/25,4/7/2025,Above,74,,,231.8,7.378423162,,
+KC,ZN,4,June,24/06/25,4/7/2025,Below,128,,,739.3,23.53264989,,
+KC,ZN,3,June,24/06/24,4/7/2025,Above,125,,,415.7,13.23214197,,
+KC,ZN,3,June,24/06/25,4/7/2025,Below,125,,,379.2,12.07031088,,
+KC,ZN,6,June,24/06/25,4/7/2025,Above,74,,,341.1,10.85755022,,
+KC,ZN,5,June,24/06/25,4/7/2025,Below,74,,,275.2,8.759888068,,
+KC,ZN,4,June,24/06/25,4/7/2025,Above,128,,,473.8,15.08152241,,
+KC,ZN,1,June,24/06/25,4/7/2025,Below,94,,,246.1,7.833606299,,
+KC,ZN,2,June,24/06/25,4/7/2025,Below,92,,,407.7,12.97749406,,
+KC,ZN,2,June,24/06/25,4/7/2025,Above,92,,,463.5,14.75366322,,
+KC,ZN,1,June,24/06/25,4/7/2025,Above,94,,,362.5,11.53873337,,
+KC,ZN,6,June,24/06/25,4/7/2025,Below,74,,,389.3,12.39180387,,
