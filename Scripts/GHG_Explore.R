@@ -227,7 +227,7 @@ Gasflux2 <-
          CH4flux2 = (CH4flux2*60*60) / (314.159 / 1e4))
   
 
-##Testing out what just moles/s looks like
+##Same code from Calculations for Slope but utilizing it for SlopeTest: See below
 TestSlope <-   Gasflux2 %>% 
   mutate(Shade_Per= as.factor(Shade_Per), Replicate= as.factor(Replicate)) %>% 
   mutate(Mole= ((Pressure*Volume)/(0.08205*Temperature)), CO2m=(CO2*Mole), CH4m=(CH4*Mole)) %>% #Mole is amount of moles present with each closed chamber, CO2m is amount of CO2 micromoles present with amount of moles of dry gas present
@@ -238,6 +238,8 @@ TestSlope <-   Gasflux2 %>%
   mutate(CO2flux2 = (as.numeric(CO2m) - lag(as.numeric(CO2m), n = 1)),
          CH4flux2 = (as.numeric(CH4m) - lag(as.numeric(CH4m), n = 1)))
 
+
+##Slope Test used within Functional Diversity Chunk to manually add Functional diversity metrics AND Species presence!
 SlopeTest <- Gasflux2 %>% 
   filter(Dur > 120, Dur < 241) %>% 
   group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>% 
@@ -247,22 +249,24 @@ SlopeTest <- Gasflux2 %>%
     Volume    = first(Volume),            # keep Volume (or any other static columns)
     .groups   = "drop"
   )
-  
+
+
+#Identifier for a join (but could not figure out how to join )  
 SlopeTest <- SlopeTest %>% mutate(Treat_Rep = paste(Mesocosm_Treatment, Replicate))
 
 write.csv(SlopeTest, "SlopeTest.csv") #<- creates csv just for slope data
 
 
 
-
+##Seeing entire Green House Gas raw data as a whole to see each point
 GHGTest <- GHG %>% 
   mutate(TEST = as.numeric(TIME))
-
+## Plotly package for interactive graph!
 #install.packages("plotly")
 library(plotly)
 
 GHGlook<- GHG %>% 
-  filter(as.numeric(TIME) > 35326, as.numeric(TIME)<54305, CO2<3000, CO2>1100) %>% 
+  filter(as.numeric(TIME) > 35326, as.numeric(TIME)<54305, CO2<3000, CO2>1100) %>%  #removes time before and after the entire run time for all of the monitoring
   ggplot(aes(x=TIME, y=CO2))+
   geom_point()
 
@@ -270,8 +274,7 @@ ggplotly(GHGlook)
 
 ###-Visualizing Variation-----
 
-
-#purpose is to find outliers within Treatments
+##This chunk is used to look at variation of data and outliers within Treatments
 
 
 Gasflux2 %>%  #Identifies outliers? among Mesocosm treatments which 
