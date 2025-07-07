@@ -7,7 +7,7 @@
 ## Author: Alyson Hall
 ##
 ## Date Created: 2025-06-12
-## Date Edited: 2025-06-27
+## Date Edited: 2025-07-07
 ## Lat Edited By: AH
 ## 
 ##
@@ -50,7 +50,10 @@ Measure <- read_excel("Data/GHG_2025-06-12.xlsx", sheet = 2) %>%
                 mutate(Start_Time = hms::as_hms(Start_Time),
                        End_Time = hms::as_hms(End_Time),
                        Shade_Per = as.factor(Shade_Per),
-                       Replicate = as.factor(Replicate))
+                       Replicate = as.factor(Replicate),
+                       Air_Height = Height_Sediment_Bucket - 3.5,
+                       # Getting a volume of the air (in L)
+                       Air_Volume = (pi*Air_Height*(17.5)^2)/1000)
 
 
 Light <- read_excel("Data/Mesocosm_lightfield.xlsx") %>% 
@@ -73,10 +76,7 @@ Combo <-
 Gasflux <- 
   Combo %>% 
       mutate(Dur = difftime(Combo$TIME, Combo$Start_Time)) %>% # Create a column for runtime 
-      filter(!Dur == "NA") # Remove the NA (between measurements and before machine started)
-
-Gasflux <-
-  Gasflux %>% 
+      filter(!Dur == "NA") %>%   # Remove the NA (between measurements and before machine started)
       left_join(Light %>% 
                   select(c("Pot_Location", "Water")), 
                   by = c("Current_Location" = "Pot_Location"))
@@ -90,10 +90,9 @@ Fluxes <-
   Gasflux %>%
   group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>%
   arrange(Mesocosm_Treatment, Replicate, Shade_Per, Dur) %>% 
-  # Generating fluxes for gar exchange per s 
+  # Generating fluxes for each pot exchange per s 
   mutate(CO2flux = (as.numeric(CO2) - lag(as.numeric(CO2), n = 1)),
-         CH4flux = (as.numeric(CH4) - lag(as.numeric(CH4), n = 1)),
-         CO2rate = (CO2flux*60*60)/ (314.159 / 1e4)) 
+         CH4flux = (as.numeric(CH4) - lag(as.numeric(CH4), n = 1))) 
 
 
 
@@ -103,22 +102,26 @@ Slope <- Gasflux %>%
   filter(Dur < 241) %>% 
   filter(Dur > 60) %>% 
   group_by(Mesocosm_Treatment, Replicate, Shade_Per) %>%
-  summarise(
+  reframe(
     CO2_fit = list(lm(as.numeric(CO2) ~ as.numeric(Dur))),
     CH4_fit = list(lm(as.numeric(CH4) ~ as.numeric(Dur))),
+    Air_Volume = Air_Volume,
     .groups = "drop"
   ) %>%
   # Right now our units are in ppm CO2 per s per 20 cm2 pot
   mutate(
-    CO2flux = (map_dbl(CO2_fit, ~ coef(.x)[[2]]))*60*60,  # slope of CO2 ~ hour
-    CH4flux = (map_dbl(CH4_fit, ~ coef(.x)[[2]]))*60*60   # slope of CH4 ~ hour
+    CO2change = (map_dbl(CO2_fit, ~ coef(.x)[[2]]))*60*60,  # slope of CO2 ~ hour
+    CH4change = (map_dbl(CH4_fit, ~ coef(.x)[[2]]))*60*60   # slope of CH4 ~ hour
   ) %>%
   select(-CO2_fit, -CH4_fit) %>% 
-  # Now our units are in ppm CO2 per hour per 20 cm2, Our pots have 314.159cm2
-  mutate(CO2flux = CO2flux/ (314.159 / 1e4),  
-         CH4flux = CH4flux/ (314.159 / 1e4))  %>% 
+  # Now our units are in ppm CO2 per hour per 20 cm2, Our pots have 314.159cm2 and correct for the L of air
+  mutate(CO2flux = ((CO2change/ (314.159 / 1e4))*Air_Volume),  
+         CH4flux = ((CH4change/ (314.159 / 1e4))*Air_Volume))  %>% 
   unique()
   # Now our units are in ppm CO2 per hour per m2
+
+
+## Do we nee this??
 
 Slope <- Gasflux2 %>% 
   filter(Dur > 100, Dur < 241) %>% 
@@ -830,22 +833,84 @@ SpeciesTest2 %>%
 
 #### Figs for Katie --------------------------------
 
+# Range in CO2
+
+Gasflux %>% 
+  filter(!Dur < 60) %>% 
+  reframe(max = max(CO2),
+          min = min(CO2))
+
+
+# Average  CO2 flux per pot per treatment 
+
+Slope %>% #
+  ggplot(aes(x=Replicate, y=CO2flux, color = Shade_Per))+ 
+  geom_point(size = 3)+
+  ylab("CO2 ppm per hour per m2") +
+  facet_wrap(~Mesocosm_Treatment, scales = "free") +
+  scale_y_continuous(labels = scales::comma)
+
+# Average CO2 flux per pot per treatment 
+
 Slope %>% #
   ggplot(aes(x=Mesocosm_Treatment, y=CO2flux, color = Shade_Per))+ 
-  geom_boxplot()+
-  ylab("CO2 ppm hour-1 m2-2")
-  
-  
-  Slope %>% #
-    ggplot(aes(x=Replicate, y=CH4flux, color = Shade_Per))+ 
-    geom_boxplot()+
-    ylab("CO2 ppm hour-1 m2-2")
-  facet_wrap(~Mesocosm_Treatment)
-  
-  Gasflux %>% 
-    filter(!Dur < 60) %>% 
-    ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
-    geom_point() +
-    facet_wrap(~Mesocosm_Treatment)+
-    theme_classic()
+  geom_boxplot(size = 1)+
+  ylab("CO2 ppm per hour per m2") +
+  theme_classic() +
+  scale_y_continuous(labels = scales::comma)
+
+# Intercepts of buckets 
+
+Gasflux %>% 
+  filter(!Dur < 60) %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  geom_point() +
+  ylab("CO2 (ppm)") +
+  facet_wrap(~Mesocosm_Treatment)+
+  theme_classic()
+
+# Some examples of weird shapes 
+
+Gasflux %>% 
+  # filter(Dur>60) %>% 
+  filter(Mesocosm_Treatment== "HIGH") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  ggtitle("High Diversity Treatments") +
+  geom_point() +
+  facet_wrap(~Replicate, scales = "free_y", ncol = 1) 
+
+Gasflux %>% 
+  filter(Dur>60) %>% 
+  filter(Mesocosm_Treatment== "LOW") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  ggtitle("High Diversity Treatments") +
+  geom_point() +
+  facet_wrap(~Replicate, scales = "free_y") 
+
+Gasflux %>% 
+  filter(Dur>60) %>% 
+  filter(Mesocosm_Treatment== "CON") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  ggtitle("High Diversity Treatments") +
+  geom_point() +
+  facet_wrap(~Replicate, scales = "free_y") 
+
+Gasflux %>% 
+  filter(Dur>60) %>% 
+  filter(Mesocosm_Treatment== "MED") %>% 
+  ggplot(aes(x=Dur, y=CO2, color=Shade_Per))+
+  ggtitle("High Diversity Treatments") +
+  geom_point() +
+  facet_wrap(~Replicate, scales = "free_y") 
+ 
+
+# Flux Summary 
+
+Slope %>% 
+  mutate(CO2change = CO2change/60) %>% 
+  ggplot(aes(x = Mesocosm_Treatment, y = CO2change, color = Shade_Per))+ 
+  geom_boxplot(size = 1)+
+  ylab("CO2 ppm per min / L") +
+  theme_classic() +
+  scale_y_continuous(labels = scales::comma)
 
