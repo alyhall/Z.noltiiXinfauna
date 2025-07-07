@@ -21,6 +21,11 @@
 ## Chamber Low 4, 100 shadig didn't get 4 mins
 ## Found out High 1 Shaded 100% had wrong time input from 11:38 - 11:32 corrected it to 11:42 
 
+
+## TO DO:
+# Look at background levels for CO2
+# Look at time right before and right after incubation to see if we see a giant jump
+
 ## Packages Needed
 
 library(tidyverse)
@@ -80,6 +85,22 @@ Gasflux <-
       left_join(Light %>% 
                   select(c("Pot_Location", "Water")), 
                   by = c("Current_Location" = "Pot_Location"))
+
+# WHY ISNT THIS WORKING 
+
+
+GasfluxNEG <- 
+  Combo %>% 
+  mutate(Dur = as.numeric(difftime(Combo$TIME, Combo$Start_Time))) %>% 
+  filter((is.na(Dur))) 
+
+# Large differences in background
+
+GasfluxNEG %>% 
+  ggplot(
+    aes( x = TIME, y = CO2) ) + 
+  geom_point() +
+  ylim(-2000, 2000)
 
 
 ## Calculations ----------------------------------------------
