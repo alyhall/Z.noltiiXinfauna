@@ -18,7 +18,7 @@
 ## Notes:
 ##
 ## Licore time was behind real time by 50 s
-## Chamber Low 4, 100 shadig didn't get 4 mins
+## Chamber Low 4, 100 shading didn't get 4 mins
 ## Found out High 1 Shaded 100% had wrong time input from 11:38 - 11:32 corrected it to 11:42 
 
 
