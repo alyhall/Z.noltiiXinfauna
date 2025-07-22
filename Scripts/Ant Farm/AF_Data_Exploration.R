@@ -7,7 +7,7 @@
 ## Author: Alyson & Ashitha
 ##
 ## Date Created: 2025-07-18
-## Date Edited: 2025-07-18
+## Date Edited: 2025-07-22
 ## Last Edited by: Alyson
 ##
 
@@ -35,4 +35,4 @@ ImageJ <- read_excel("Data/Ant Farm/ImageJ_Analysis.xlsx",
 # - read in ImageJ Data
 # - read in treatment data 
 # Merge them together using a function from the join() family (Ex: left_join())
-# Create a summary boxplot for some of the metrics per species through time
+# Create a summary box plot for some of the metrics per species through time
