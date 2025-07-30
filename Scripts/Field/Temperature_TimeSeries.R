@@ -13,7 +13,7 @@
 
 ##Packages need-----------
 
-library(tidyverse) #love that lubridate is a part of tidyverse
+library(tidyverse) 
 
 ##Loading Data---------
 
@@ -51,7 +51,7 @@ as.numeric(Temp$Date[35])
 
 
 
-###Figures for  Creek and Plots-------
+###Figures for  Creek and Plots (Before May-June)-------
 
 Temp %>% 
   ggplot(aes(x=Date, y=TempC, color=Location))+
@@ -78,45 +78,46 @@ Temp %>%  ##Daily averages
 
 
 
-## June and May? -----
+## June and May PLOTS (T1)-----
   
 May <- May_T1_0 %>% 
-  mutate(Date = mdy_hm(Date), Day = as.Date(Date))
+  mutate( Date = mdy_hm(Date), Day =as.Date(Date), Location = "Plots" )
 
 
 June <- June_Plots %>%  
-  mutate(Date = mdy_hm(Date), Day = as.Date(Date))
+  mutate( Date = mdy_hm(Date), Day = as.Date(Date), Location = "Plots" )
 
+Plots1 <- rbind(May, June) 
 
+PlotsF <- rbind(Plots1, Plots)
 
+TempF <- rbind(Plots1, Temp)
 ###Figures---
-    
-
-####May Transect 1?----
 
 
-May %>%  ##Daily averages 
-  group_by(Day) %>% 
-  mutate(MTemp = mean(Temp)) %>% 
-  ggplot(aes(x=Day, y=MTemp))+
+Plots1 %>%  ##Daily averages  ONLY Plots May-June
+  group_by(Location, Day) %>% 
+  mutate(DSD=sd(TempC), MTempC = mean(TempC)) %>% 
+  ggplot(aes(x=Day, y=MTempC, color=Location))+
   geom_line()+
   scale_x_date(date_breaks = "1 week", date_labels = "%d-%B")+
   labs(y="Temperature (°C)")
 
-####June Sandbar Plots? -----
-
-June %>%  ##Daily averages 
-  group_by(Day) %>% 
-  mutate(MTemp = mean(Temp)) %>% 
-  ggplot(aes(x=Day, y=MTemp))+
+PlotsF %>%  ##Daily averages of PLOTS
+  group_by(Location, Day) %>% 
+  mutate(DSD=sd(TempC), MTempC = mean(TempC)) %>% 
+  ggplot(aes(x=Day, y=MTempC, color=Location))+
   geom_line()+
-  scale_x_date(date_breaks = "1 week", date_labels = "%d-%B")+
+  scale_x_date(date_breaks = "1.5 week", date_labels = "%d-%B")+
   labs(y="Temperature (°C)")
 
 
-June %>% 
-  ggplot(aes(x=Date, y=Temp))+
-  geom_line(alpha=0.5)+
-  scale_x_datetime(date_breaks = "4 day", date_labels = "%d-%B")
 
+TempF %>%  ##Daily averages of Creek and Plots
+  group_by(Location, Day) %>% 
+  mutate(DSD=sd(TempC), MTempC = mean(TempC)) %>% 
+  ggplot(aes(x=Day, y=MTempC, color=Location))+
+  geom_line()+
+  scale_x_date(date_breaks = "1.5 week", date_labels = "%d-%B")+
+  labs(y="Temperature (°C)")
 
