@@ -1,0 +1,43 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+ggplot(summp, aes(x = Time_Point, y = mean_s, fill = Species)) +
+         geom_bar(stat = "identity", position = "dodge") +
+         geom_errorbar(aes(ymin = mean_s - se_s, ymax = mean_s + se_s),
+                       width = 0.2,
+                       position = position_dodge(0.9)) +
+         labs(title = "",
+              x = "Time Point", y = "Mean Per_Lum") +
+         theme_minimal()
+
+```
+
+```{r}
+summp <- dfs %>%
+  group_by(Time_Point) %>%
+  summarise(
+    mean_s = mean(Per_Lum, na.rm = TRUE),
+    sd_s = sd(Per_Lum, na.rm = TRUE),
+    n = n(),
+    se_s = sd_s / sqrt(n)
+  )
+
+
+
+ggplot(summp, aes(x = Time_Point, y = mean_s)) +
+         geom_bar(stat = "identity", position = "dodge") +
+         geom_errorbar(aes(ymin = mean_s - se_s, ymax = mean_s + se_s),
+                       width = 0.2,
+                       position = position_dodge(0.9)) +
+         labs(title = "",
+              x = "Time Point", y = "Mean Per_Lum") +
+         theme_minimal()
+```
+
