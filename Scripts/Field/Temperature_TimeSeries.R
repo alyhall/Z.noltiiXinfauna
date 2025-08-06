@@ -118,6 +118,7 @@ TempF %>%  ##Daily averages of Creek and Plots
   mutate(DSD=sd(TempC), MTempC = mean(TempC)) %>% 
   ggplot(aes(x=Day, y=MTempC, color=Location))+
   geom_line()+
+  geom_smooth(se=FALSE, method= "lm")+
   scale_x_date(date_breaks = "1.5 week", date_labels = "%d-%B")+
   labs(y="Temperature (°C)")
 

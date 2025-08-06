@@ -1,0 +1,21 @@
+Treatment,Replicate,Percentage_Sand,Percentage_Grass ,Coring_Notes,Shoot_Count,Flowering_Shoot,Length_1_cm,Length_2_cm,Length_3_cm,Length_4_cm,Length_5_cm,Cera_Planted,Cera_Recruit,Cera_Total,Scro_Planted,Scro_Recruit,Scro_Total,Aren_Planted,Aren_Recruit,Aren_Total,Hedi_Planted,Hedi_Recruit,Hedi_Total,Neph_Planted,Neph_Recruit,Neph_Total,Glyc_Planted,Glyc_Recruit,Glyc_Total,Mya_Planted,Mya_Recruit,Mya_Total,Lana,Lagis,Notes,Initials
+Control,1,5,95,No obvious BT,286,,18,21,19,7,16,,1,1,,1,1,,,,,,,,,,,2,2,,,,,,,KC
+Control,2,0,100,No obvious BT,371,,14.2,16.5,8.9,9.4,12,,2,2,,,,,,,,,,,,,,1,1,,,,4,,,AH
+Control,3,0,100,"No obvious BT, strong sulphide smell",405,,19.7,16.4,7.9,11.3,9.8,,1,1,,3,3,,,,,,,,,,,,,,,,,,2 Mystery worm,AH
+Control,4,0,100,No obvious BT,386,4,19,15,19,18,15,,,,,,,,,,,,,,,,,1,1,,,,,,,KC
+Control,5,5,95,No obvious BT,465,,20.5,19,16,24,15,,,,,1,1,,,,,,,,,,,1,1,,,,3,,,KC
+Low,1,5,95,"No obvious BT, very compact",286,1,18.4,15.1,14,14.3,16.6,,,,,,,,,,,,,,,,1,1,1,,,,1,,,JW
+Low,2,10,90,"No obvious BT, strong sulphide smell, black seal ",408,,14.5,2.5,20,14,16,1,,1,1,,,,,,,,,,,,1,,,,,,6,,,KD
+Low,3,30,70,1st in cast,246,,20,26,18,21,19,,1,1,,3,3,1,,1,,,,,2,2,1,,,,,,5,,,KD
+Low,4,10,90,"1st in small cast, strong sulphide smell",213,,27.7,16,17.2,19,9.8,,,,1,,,,,,,,,,,,1,,,1,,1,,,,JW +  CR
+Low,5,30,70,"1st in cast, 3rd lost",195,,15.5,19,23.5,13.5,5,,,,1,,,1,,1,,,,,,,,,,1,,1,4,,,KD
+Medium,1,30,70,,286,,20,22,22.3,25,19,,1,1,,1,1,1,,1,,,,1,,1,,,,,,,2,6,,KD
+Medium,2,45,55,,299,,11.5,13,15,23,11,1,1,2,,5,5,1,,1,,,,,,,1,,1,,,,2,2,2 mysery worm,KC
+Medium,3,30,70,1st in small BT,226,,9.8,13.3,18.5,18.5,13.5,1,1,2,,1,1,1,,1,1,,1,,,,,,,,,,,,,AH
+Medium,4,5,95,1st core in sand patch,450,,14,11.1,14.6,16.5,18.2,1,1,2,,,,,1,1,1,,1,,,,,,,1,,1,5,1,1 Amphipod,JW
+Medium,5,30,70,No obvious BT,208,2,14,11,18.5,14,20,,1,1,1,,1,,,,,,,,,,1,,1,,,,3,,,AH
+High,1,35,65,,325,,17,14.5,18,20,15,,1,1,,1,1,1,,1,,,,1,,1,,,,1,,1,7,,"1 mystery worm, Frozen Mya",H1
+High,2,45,55,1st in large cast,184,,24,16,21.2,15.9,20.6,,,,1,,1,1,,1,,,,,,,1,,1,,,,6,,1 Amphipod,JW
+High,3,25,75,1 dead cockle,310,1,9,21.5,16,13.5,14,,,,,,,1,,1,,,,,,,,,,,,,3,,,KC
+High,4,80,20,"All cores in sand, 1/2 of 1st core lost",234,3,17.9,18.4,10,15.3,16,1,,1,1,,1,1,,1,,,,,,,,,,,,,3,2,,AH
+High,5,25,75,"AM Cast --> large subsurface water, space for one core",386,1,13,15,11.5,11,18,1,,1,1,1,2,1,,1,,,,,,,,,,,,,1,,,AH
