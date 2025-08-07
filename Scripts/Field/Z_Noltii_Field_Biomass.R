@@ -9,9 +9,9 @@ library(tidyverse)
 
 
 ##Lab_Core.csv from shared Z. Noltii google drive (/Raw Data/Field/Field_Ambient_Seagrass -- Sheet Lab_Cores )
-ABZ <- read_csv("Data/Lab_Core.csv", na = c("","NA"))
+ABZ <- read_csv("Data/Field/Lab_Core.csv", na = c("","NA"))
 ABZ$Month <- forcats::as_factor(ABZ$Month) #forcats::as_factor to ensure Month order is written as in csv file
-ABZ$Biomass_Part <- forcats::as_factor(ABZ$Biomass_Part) #Unsure why this is needed but doesn't work without it
+ #Unsure why this is needed but doesn't work without it
 ABZ <- ABZ %>% 
   mutate(TSC=(TSC*(100/pi))) %>% #Makes TSC Total Shoot Count/m^2 
   mutate(ID=row_number()) %>% #Ensures if any data is missing a unique identifier (such as sample ID and replicate) subsetted data can identify which data point is which 
