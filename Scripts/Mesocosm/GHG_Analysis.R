@@ -27,7 +27,6 @@
 
 ## Packages Needed
 
-HELLO!!!!
 
 library(tidyverse)
 library(readxl)
