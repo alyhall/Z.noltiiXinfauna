@@ -65,45 +65,30 @@ FSC <-
 # Combined clean flux data
 
 Gas_Flux <- 
-  read.csv("Data/Mesocosm/Exported_Data/Combined_Gas_Fluxes.csv")
+  read.csv("Data/Mesocosm/Exported_Data/Combined_Gas_Fluxes.csv") %>% 
+  mutate(
+    Shade_Per = as.factor(Shade_Per)
+  )
  
-## Calculations ------
-
-# Average for Water
-Gas_Flux %>% 
-  filter(Run_Type == "Water") %>% 
-  ggplot(aes( x = Mesocosm_Treatment, y = CO2_flux, color = Shade_Per)) +
-  geom_violin() +
-  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
-  facet_wrap(~Shade_Per) +
-  theme_bw()
-
+## Data Explore Broad ------
 
 Gas_Flux %>% 
-  filter(Run_Type == "Water") %>% 
-  ggplot(aes( x = Mesocosm_Treatment, y = CH4_flux, color = Shade_Per)) +
-  geom_violin() +
-  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
-  facet_wrap(~Shade_Per) +
+  pivot_longer(
+    cols = c(CO2_flux, CH4_flux),
+    names_to = "Gas",
+    values_to = "Flux"
+  ) %>% 
+  ggplot(aes(x = Mesocosm_Treatment, y = Flux, color = Shade_Per)) +
+  geom_boxplot() +
+  facet_grid(
+    Gas ~ Run_Type,
+    scales = "free_y"
+  ) +
+  labs(
+    y = "Flux (mmol gas m⁻² h⁻¹)"
+  ) +
   theme_bw()
 
-
-#Average for Air
-Gas_Flux %>% 
-  filter(Run_Type == "Air") %>% 
-  ggplot(aes( x = Mesocosm_Treatment, y = CO2_flux, color = Shade_Per)) +
-  geom_violin() +
-  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
-  facet_wrap(~Shade_Per) +
-  theme_bw()
-
-Gas_Flux %>% 
-  filter(Run_Type == "Air") %>% 
-  ggplot(aes( x = Mesocosm_Treatment, y = CH4_flux, color = Shade_Per)) +
-  geom_violin() +
-  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
-  facet_wrap(~Shade_Per) +
-  theme_bw()
 
 
 ## PAR ---------

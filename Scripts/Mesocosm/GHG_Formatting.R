@@ -158,12 +158,12 @@ Slope_Water <-
   # Right now our units are in ppm CO2 per s per 20 cm2 pot
   
   mutate(
+    # CO2 is ppm per hour
+    CO2_ppm_h = map_dbl(CO2_fit, ~ coef(.x)[2]) * 3600,
+    # CH4 is ppb per hour
+    CH4_ppb_h = map_dbl(CH4_fit, ~ coef(.x)[2]) * 3600,
     
-    # ppm per hour
-    CO2_ppm_h = map_dbl(CO2_fit, ~ coef(.x)[2])*60*60,  # slope of CO2 ~ hour,
-    CH4_ppm_h = map_dbl(CH4_fit, ~ coef(.x)[2])*60*60,  # slope of CH4 ~ hour,
-    
-    # constants (from licor)
+    # LI-COR conditions
     Pressure_atm = CAVITY_P / 101.325,
     Temp_K = CAVITY_T + 273.15,
     R = 0.082057,
@@ -171,21 +171,22 @@ Slope_Water <-
     # total mol air in chamber
     mol_air = (Pressure_atm * Air_Volume) / (R * Temp_K),
     
-    # ppm = umol/mol
+    # CO2: ppm = umol / mol
     CO2_umol_h = CO2_ppm_h * mol_air,
-    CH4_umol_h = CH4_ppm_h * mol_air,
-    
-    # convert to mmol
     CO2_mmol_h = CO2_umol_h / 1000,
-    CH4_mmol_h = CH4_umol_h / 1000,
     
-    # Now our units are in ppm CO2 per hour per 20 cm2. Our pots have an area of 314.159cm2
+    # CH4: ppb = nmol / mol
+    CH4_nmol_h = CH4_ppb_h * mol_air,
+    CH4_mmol_h = CH4_nmol_h / 1e6,
+    
+    # pot footprint area
     Area_m2 = 314.159 / 1e4,
     
-    # final fluxes (mmol gas m⁻² h⁻¹)
+    # final fluxes: mmol gas m^-2 h^-1
     CO2_flux = CO2_mmol_h / Area_m2,
     CH4_flux = CH4_mmol_h / Area_m2
   ) %>%
+  
   select(
     Mesocosm_Treatment:Current_Location,
     CO2_flux,
@@ -226,11 +227,12 @@ Slope_Air <-
   ) %>%
   
   mutate(
-    # ppm per hour
-    CO2_ppm_h = map_dbl(CO2_fit, ~ coef(.x)[2]) * 60 * 60,
-    CH4_ppm_h = map_dbl(CH4_fit, ~ coef(.x)[2]) * 60 * 60,
+    # CO2 is ppm per hour
+    CO2_ppm_h = map_dbl(CO2_fit, ~ coef(.x)[2]) * 3600,
+    # CH4 is ppb per hour
+    CH4_ppb_h = map_dbl(CH4_fit, ~ coef(.x)[2]) * 3600,
     
-    # constants from LI-COR
+    # LI-COR conditions
     Pressure_atm = CAVITY_P / 101.325,
     Temp_K = CAVITY_T + 273.15,
     R = 0.082057,
@@ -238,21 +240,22 @@ Slope_Air <-
     # total mol air in chamber
     mol_air = (Pressure_atm * Air_Volume) / (R * Temp_K),
     
-    # ppm = umol/mol
+    # CO2: ppm = umol / mol
     CO2_umol_h = CO2_ppm_h * mol_air,
-    CH4_umol_h = CH4_ppm_h * mol_air,
-    
-    # convert to mmol
     CO2_mmol_h = CO2_umol_h / 1000,
-    CH4_mmol_h = CH4_umol_h / 1000,
+    
+    # CH4: ppb = nmol / mol
+    CH4_nmol_h = CH4_ppb_h * mol_air,
+    CH4_mmol_h = CH4_nmol_h / 1e6,
     
     # pot footprint area
     Area_m2 = 314.159 / 1e4,
     
-    # final fluxes (mmol gas m⁻² h⁻¹)
+    # final fluxes: mmol gas m^-2 h^-1
     CO2_flux = CO2_mmol_h / Area_m2,
     CH4_flux = CH4_mmol_h / Area_m2
   ) %>%
+  
   select(
     Mesocosm_Treatment:Current_Location,
     CO2_flux,
